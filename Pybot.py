@@ -20,6 +20,7 @@ if sys.platform == 'win32':
 if sys.platform == 'android': 
 	dictName = '/storage/sdcard1/dict.json'
 	cmdsName = '/storage/sdcard1/commands.json'
+	import pluginAndroid
 	
 def main(input=None, context=None, words=['hi'], commands=[], cmdline=0, server1=0):
 	#### command line
