@@ -5,8 +5,8 @@ import os, sys, urllib2
 realcwd = os.path.dirname(os.path.realpath(__file__))
 
 #urls=[0]*2; 
-urls={}; urls['pluginGitHub.py'] = 'http://raw.githubusercontent.com/auwsome/pybot/master/Pybot.py'
-
+urls={}; urls['Pybot.py'] = 'http://raw.githubusercontent.com/auwsome/pybot/master/Pybot.py'
+#urls['pluginGitHub.py'] = 'http://raw.githubusercontent.com/auwsome/pybot/master/pluginGitHub.py'
 if sys.platform == 'win32'  : urls['pluginWindows.py'] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginWindows.py'
 if sys.platform == 'android': urls['pluginAndroid.py'] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginAndroid.py'
 if sys.platform == 'darwin' : urls['plugin.py'] = 'https://raw.githubusercontent.com/auwsome/pybot/master/plugin .py'
