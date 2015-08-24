@@ -4,7 +4,7 @@ import os, sys, urllib2
 
 realcwd = os.path.dirname(os.path.realpath(__file__))
 
-urls[0] = 'http://raw.githubusercontent.com/auwsome/pybot/master/Pybot.py'
+urls=[]; urls[0] = 'http://raw.githubusercontent.com/auwsome/pybot/master/Pybot.py'
 
 if sys.platform.system() == 'windows': urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginWindows.py'
 if os.name == 'android': urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginAndroid.py'
