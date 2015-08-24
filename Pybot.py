@@ -10,7 +10,7 @@ import serverSCP as s
 
 dctn={'is':'equals', 'thing':'something', 'quit':'end loop', 'how':'thing', '?':'question mark', ' ':'space'}
 
-def readFiles()
+readFiles()
 
 
 ################## init vars
