@@ -154,7 +154,7 @@ def dumpFiles():
 	
 def getFilesRemote(url=None):
 	import urllib2
-	urls[0] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginGitHub.py'
+	urls=[]; urls[0] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginGitHub.py'
 	filenames[0] = 'pluginGitHub.py'
 	for url in urls[url]:
 		req = urllib2.Request(url1)
