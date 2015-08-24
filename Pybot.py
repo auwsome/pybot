@@ -4,21 +4,24 @@ import os, sys, subprocess
 import csv, json
 #import threading
 try:
-	#import serverSCP as s
+	import serverSCP as s
 except ImportError,e: print str(e)
 
-if sys.platform.system() == 'windows': system = 'windows'
-if os.name == 'android': system = 'android'
-if os.name == 'posix': system = 'posix'
-if sys.platform.system() == 'Linux': system = 'Linux'
-print system
+print sys.platform
 
-global realcwd = os.path.dirname(os.path.realpath(__file__))
-global cwd = os.getcwd()
+global realcwd; realcwd = os.path.dirname(os.path.realpath(__file__))
+global cwd; cwd = os.getcwd()
 #print 'path= ' realcwd
-global dctn={'is':'equals', 'thing':'something', 'quit':'end loop', 'how':'thing', '?':'question mark', ' ':'space'}
-
-def main(input=None, context=None, words=['hi'], commands=[], cmdline=1, server1=0):
+global dctn; dctn={'is':'equals', 'thing':'something', 'quit':'end loop', 'how':'thing', '?':'question mark', ' ':'space'}
+global dictName, cmdsName
+if sys.platform == 'win32': 
+	dictName = realcwd+'\dict.json'
+	cmdsName = realcwd+'\commands.json'
+if sys.platform == 'android': 
+	dictName = '/storage/sdcard1/dict.json'
+	cmdsName = '/storage/sdcard1/commands.json'
+	
+def main(input=None, context=None, words=['hi'], commands=[], cmdline=0, server1=0):
 	#### command line
 	if cmdline==1:
 		try: 
@@ -41,7 +44,7 @@ def main(input=None, context=None, words=['hi'], commands=[], cmdline=1, server1
 			except Exception,e: print 'no server\n'+str(e)
 		
 		#### text input from terminal
-		if not input: 
+		if input is None: 
 			input = raw_input('>')
 			try: words = input.split(' ')
 			except: pass
@@ -121,7 +124,6 @@ def main(input=None, context=None, words=['hi'], commands=[], cmdline=1, server1
 		if response: print response	
 		
 		if 'hi' in input: print 'hello'
-		input=None
 
 	dumpFiles() 
 	print dctn	  
@@ -129,14 +131,7 @@ def main(input=None, context=None, words=['hi'], commands=[], cmdline=1, server1
 
 
 
-def readFiles(system=None):
-	################## read-in files
-	if system == 'windows': 
-		dictName = realcwd+'\dict.json'
-		cmdsName = realcwd+'\commands.json'
-	if system == 'android': 
-		dictName = '/storage/sdcard1/dict.json'
-		cmdsName = '/storage/sdcard1/commands.json'
+def readFiles():
 	try: 
 		with open(dictName, 'rb') as outfile:
 			filedict = json.load(outfile)
@@ -144,7 +139,7 @@ def readFiles(system=None):
 				if not key in dctn.keys(): dctn[key] = value
 		with open(cmdsName, 'rb') as outfile:
 			commands = json.load(outfile)
-	except Exception,e: print system, str(e)
+	except Exception,e: print sys.platform, str(e)
 	
 def dumpFiles():	
 	try:	
@@ -154,15 +149,14 @@ def dumpFiles():
 	
 def getFilesRemote(url=None):
 	import urllib2
-	urls=[]; urls[0] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginGitHub.py'
-	filenames[0] = 'pluginGitHub.py'
-	for url in urls[url]:
-		req = urllib2.Request(url1)
+	urls={}; urls['pluginGitHub.py'] = 'http://raw.githubusercontent.com/auwsome/pybot/master/pluginGitHub.py'
+	for url in urls:
+		req = urllib2.Request(urls[url])
 		response = urllib2.urlopen(req)
 		# print response.getcode()
 		# print response.headers.getheader('content-type')
 		page = response.read()
-		outfile = os.path.join(realcwd,filenames[url])
+		outfile = os.path.join(realcwd,url)
 		with open(outfile, 'w') as file:
 			file.write(page)
 		print outfile
@@ -175,5 +169,5 @@ def PBcreateBranch():
 
 # run functions now that defined in any order above
 if __name__=="__main__":
-	readFiles(system)
+	readFiles()
 	main()
