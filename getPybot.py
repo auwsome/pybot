@@ -4,16 +4,17 @@ import os, sys, urllib2
 
 realcwd = os.path.dirname(os.path.realpath(__file__))
 
-urls=[]; urls[0] = 'http://raw.githubusercontent.com/auwsome/pybot/master/Pybot.py'
+urls=[0]*2; 
+urls[0] = 'http://raw.githubusercontent.com/auwsome/pybot/master/Pybot.py'
 
-if sys.platform.system() == 'windows': urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginWindows.py'
-if os.name == 'android': urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginAndroid.py'
-if os.name == 'posix': urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/plugin .py'
-if sys.platform.system() == 'Linux': urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/plugin .py'
+if sys.platform == 'win32'  : urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginWindows.py'
+if sys.platform == 'android': urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/pluginAndroid.py'
+if sys.platform == 'darwin' : urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/plugin .py'
+if sys.platform == 'linux2' : urls[1] = 'https://raw.githubusercontent.com/auwsome/pybot/master/plugin .py'
 
-print os.name, sys.platform.system(), sys.platform.release()
+print os.name, sys.platform
 
-for url in urls[url]:
+for i,url in enumerate(urls):
 	req = urllib2.Request(url)
 	response = urllib2.urlopen(req)
 	# print response.getcode()
