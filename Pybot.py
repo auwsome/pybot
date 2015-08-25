@@ -1,167 +1,216 @@
-#!/usr/bin/python
-"""
-Google AJAX Search Module
-http://code.google.com/apis/ajaxsearch/documentation/reference.html
-"""
+# from https://github.com/auwsome/pybot
+
+import os, sys, subprocess
+import csv, json
+#import threading
 try:
-	import simplejson as json
-except:
-	import json
-import urllib
+	import serverSCP as s
+except ImportError,e: print str(e)
 
-__author__ = "Kiran Bandla"
-__version__ = "0.1"
-URL = 'http://ajax.googleapis.com/ajax/services/search/web?'
+# vars
+global realcwd; realcwd = os.path.dirname(os.path.realpath(__file__))
+global cwd; cwd = os.getcwd()
+#print 'path= ' realcwd
+global dctn; dctn={'is':'equals', 'thing':'something', 'quit':'end loop', 'how':'thing', '?':'question mark', ' ':'space'}
+global commands; commands = []
+global input; input = None
+global args; args = None
+global context; context = None
 
-#Web Search Specific Arguments
-#http://code.google.com/apis/ajaxsearch/documentation/reference.html#_fonje_web
-#SAFE,FILTER
-"""
-SAFE
-This optional argument supplies the search safety level which may be one of:
-	* safe=active - enables the highest level of safe search filtering
-	* safe=moderate - enables moderate safe search filtering (default)
-	* safe=off - disables safe search filtering
-"""
-SAFE_ACTIVE	 = "active"
-SAFE_MODERATE   = "moderate"
-SAFE_OFF		= "off"
+print sys.platform
+global dictName, cmdsName
+if sys.platform == 'win32': 
+	dictName = realcwd+'\dict.json'
+	cmdsName = realcwd+'\commands.json'
+	#### command line have to prefix running script with 'python'
+	try: 
+		args = sys.argv[1:] 
+		input = " ".join(args)
+		#print input, words, sys.argv[0:], len(sys.argv)
+	except Exception,e: print str(e)
+	global cmdline; 
+	if args: cmdline=1
+	global serverCheck; serverCheck = 0
+if sys.platform == 'android': 
+	dictName = '/storage/sdcard1/dict.json'
+	cmdsName = '/storage/sdcard1/commands.json'
+	import pluginAndroid
 
-"""
-FILTER
-This optional argument controls turning on or off the duplicate content filter:
-
-	* filter=0 - Turns off the duplicate content filter
-	* filter=1 - Turns on the duplicate content filter (default)
-
-"""
-FILTER_OFF  = 0
-FILTER_ON   = 1
-
-#Standard URL Arguments
-#http://code.google.com/apis/ajaxsearch/documentation/reference.html#_fonje_args
-"""
-RSZ
-This optional argument supplies the number of results that the application would like to recieve. 
-A value of small indicates a small result set size or 4 results. 
-A value of large indicates a large result set or 8 results. If this argument is not supplied, a value of small is assumed. 
-"""
-RSZ_SMALL = "small"
-RSZ_LARGE = "large"
-
-
-class pygoogle:
+#### server, ie Cortana
+if serverCheck==1:
+	try: 
+		print 'trying'
+		input = str(s.listen())
+		print 'done'
+	except Exception,e: print 'no server\n'+str(e)
 	
-	def __init__(self,query,pages=1):
-		self.pages = pages		  #Number of pages. default 10
-		self.query = query
-		self.filter = FILTER_ON	 #Controls turning on or off the duplicate content filter. On = 1.
-		self.rsz = RSZ_SMALL		#Results per page. small = 4 /large = 8
-		self.safe = SAFE_OFF		#SafeBrowsing -  active/moderate/off
-		
-	def __search__(self,print_results = False):
-		results = []
-		for page in range(0,self.pages):
-			rsz = 8
-			if self.rsz == RSZ_SMALL:
-				rsz = 1
-			args = {'q' : self.query,
-					'v' : '1.0',
-					'start' : page*rsz,
-					'rsz': self.rsz,
-					'safe' : self.safe, 
-					'filter' : self.filter,	
-					'num' : 3
-					}
-			q = urllib.urlencode(args)
-			search_results = urllib.urlopen(URL+q)
-			data = json.loads(search_results.read())
-			print data
-			if True: #print_results:
-				if data['responseStatus'] == 200:
-					i=0;
-					for result in data['responseData']['results']:
-						for i in 3:#if result:
-							i+=1; 
-							data['responseData']['results']['link'] = i
-							print data['responseData']['results']['link']
-							response[i] = {urllib.unquote(result['url'])}
-							response[i]['title2'] = result['titleNoFormatting'].replace("&#39;","'")
-							response[i]['content2'] = result['content'].strip("<b>...</b>").replace("<b>",'').replace("</b>",'').replace("&#39;","'")
-							#print '[%s]'%(urllib.unquote(result['titleNoFormatting']))
-							#print result['titleNoFormatting'].replace("&#39;","'")
-							#print result['content'].strip("<b>...</b>").replace("<b>",'').replace("</b>",'').replace("&#39;","'")
-							#print result['content'].replace("&#39;","'")
-							#print 'from '+urllib.unquote(result['visibleUrl'])+'\n'				
-			results.append(data)
-			#print response
-		#return results
-		return response
 	
-	def search(self):
-		"""Returns a dict of Title/URLs"""
-		results = {}
-		for data in self.__search__():
-			for result in  data['responseData']['results']:
-				if result:
-					title = urllib.unquote(result['titleNoFormatting'])
-					results[title] = urllib.unquote(result['unescapedUrl'])
-		return results
-
-	def search_page_wise(self):
-		"""Returns a dict of page-wise urls"""
-		results = {}
-		for page in range(0,self.pages):
-			args = {'q' : self.query,
-					'v' : '1.0',
-					'start' : page,
-					'rsz': RSZ_LARGE,
-					'safe' : SAFE_OFF, 
-					'filter' : FILTER_ON,	
-					}
-			q = urllib.urlencode(args)
-			search_results = urllib.urlopen(URL+q)
-			data = json.loads(search_results.read())
-			urls = []
-			for result in  data['responseData']['results']:
-				if result:
-					url = urllib.unquote(result['unescapedUrl'])
-					urls.append(url)			
-			results[page] = urls
-		return results
+def main(*args):
+	response='hi';input='';choice=None;YorN=None
+	#### MAIN LOOP:
+	while response is not None:
+		################### input and convert to list of words
 		
-	def get_urls(self):
-		"""Returns list of result URLs"""
-		results = []
-		for data in self.__search__():
-			for result in  data['responseData']['results']:
-				if result:
-					results.append(urllib.unquote(result['unescapedUrl']))
-		return results
-
-	def get_result_count(self):
-		"""Returns the number of results"""
-		temp = self.pages
-		self.pages = 1
-		result_count = 0
-		try:
-			result_count = self.__search__()[0]['responseData']['cursor']['estimatedResultCount']
-		except Exception,e:
-			print e
-		finally:
-			self.pages = temp
-		return result_count
+		#### text input
+		if not response: input = raw_input('>')
+		#print 1
+		if response: input = raw_input(response+'\n>')
+		if choice: choice = raw_input('choose>')
+		if YorN: YorN = raw_input(response+' (y/n)\n>')
+		#if input == 'y' or 'yes': input = response
+		#print 2
+		# if input is None: 
+			# prompt = response+'>'
+			# input = raw_input('>')
+		try: words = input.split(' ')
+		except: pass
 		
-	def display_results(self):
-		"""Prints results (for command line)"""
-		self.__search__(True)
+		#### set context(s)
+		'''if context: 
+			phrase2 = raw_input(str(context)+ ' is ')
+			context['action'] = phrase2; context = None
+			print dctn[df[0]]['action']
+			#confirm = raw_input('confirm?')
+			#if confirm == 'y':  context = confirm; context = None; input ="okay"'''
+		
+		################### direct commands
+		if input == 'quit': response = None	
+		if input == 'save': PBcreateBranch(); break
+		if input == 'dctn': response = str(dctn); print response, dctn; continue
+		if 'hi' in input: response = 'hello'
+		
+		################### keyword based commands
+		
+		########## definitions
+		if 'is' in input and not 'what is' in input and not words[0] == 'is': 
+			df= input.split(' is ') #definition 
+			try: dctn[df[0]] = df[1]
+			except: print 'error, not entered' #dctn[df[0]]=[df[1]]
+			if df[1] == 'action':
+				dctn[df[0]]={'action':''}
+				response = 'how '+ df[0] +"?" 
+				context = dctn[df[0]]
+			response = 'okay'
+			#continue
+			
+		if 'is not' in input: 
+			split= input.split(' is not ') #remove definition 
+			try: dctn[split[0]].remove(split[1])
+			except: pass
+		
+		######## question
+		if '?' in input:	
+			input = input.strip('?') 
+			if 'what is' in input:
+				q = input.split('what is ') 
+				#print dctn[q[1]]
+				if q[1] in dctn: response = dctn[q[1]]
+				else: 
+					try: input = "search "+q[1]
+					except: response = q[1]+' is not known'
+				
+		######## google
+		if 'search' in input:
+			input = input.replace('search ','')
+			print "searching "+input
+			from pygoogle import pygoogle
+			g = pygoogle(input)
+			g.pages = 1
+			#print '*Found %s results*'%(g.get_result_count())
+			#print g.search_page_wise()#g.get_urls()
+			#g.display_results()
+			print g.display_results()
+			#response = g.display_results()
+			choose=True
+		if choice:
+			print response[choice]
+		
+		######## actions
+		if 'e' in input:
+			exec1 = input.split('e ') #exec
+			try: exec(exec1[1]); continue
+			except Exception,e: print str(e)
+		
+		if 'do' in input: #action
+			try: 
+				exec(dctn[words[1]]['action']+' "'+str(''.join(words[2:99]))+'"'); continue
+			except Exception,e: print str(e)
+			
+		if words[0] and words[0] in commands:
+			try: 
+				vcommand = words[0]
+				try: context = words.get([1])
+				except: print '1'
+				command = commands[vcommand][context]
+				pcommand = commands[vcommand]['print']
+				print vcommand,words[0],pcommand
+				print vcommand,context,command
+				if pcommand is not None:
+					input = raw_input(pcommand+' "'+str(''.join(words[2:99]))+'"? ')
+					if not input == ('y' or 'yes'): break
+					exec(pcommand+' "'+str(''.join(words[2:99]))+'"')
+				if commands[vcommand]['windows'] is not None or context == 'windows':
+					process = subprocess.Popen(commands[vcommand]['windows'], shell=True, stdout=subprocess.PIPE)
+					#subprocess.Popen("rundll32.exe powrprof.dll,SetSuspendState 0,1,0", shell=True, stdout=subprocess.PIPE)
+					process.wait(); print process.returncode
+			except Exception,e: print '3'+str(e)
+			continue
+		
+		########################### catch unknown words
+		for word in words:
+			word.strip('?')
+			if word not in dctn and 'is' not in input:  response = 'what is '+ word +"?"
+			
+		########################### output
+		#if response: print response	
+		if response is None: YorN = raw_input('anything else?')	
+		print "input="+input
+		
 
+	dumpFiles() 
+	print dctn	 
+	sys.exit()	   
+
+
+
+def readFiles():
+	try: 
+		with open(dictName, 'rb') as outfile:
+			filedict = json.load(outfile)
+			for key, value in filedict.items():
+				if not key in dctn.keys(): dctn[key] = value
+		with open(cmdsName, 'rb') as outfile:
+			commands = json.load(outfile)
+			#print commands
+	except Exception,e: print sys.platform, str(e)
 	
-if __name__ == "__main__":
-	import sys
-	query = ' '.join(sys.argv[1:])
-	#print pygoogle(' '.join(sys.argv[1:])).display_results()
-	g = pygoogle(query)
-	print '*Found %s results*'%(g.get_result_count())
-	g.pages = 1
-	g.display_results()
+def dumpFiles():	
+	try:	
+		with open(dictName, 'wb') as outfile: ##sqlite to append
+			json.dump(dctn, outfile)
+	except Exception,e: print str(e)
+	
+def getFilesRemote(url=None):
+	import urllib2
+	urls={}; urls['pluginGitHub.py'] = 'http://raw.githubusercontent.com/auwsome/pybot/master/pluginGitHub.py'
+	for url in urls:
+		req = urllib2.Request(urls[url])
+		response = urllib2.urlopen(req)
+		# print response.getcode()
+		# print response.headers.getheader('content-type')
+		page = response.read()
+		outfile = os.path.join(realcwd,url)
+		with open(outfile, 'w') as file:
+			file.write(page)
+		print outfile
+
+def PBcreateBranch():	
+	getFilesRemote()
+	import pluginGitHub
+	pluginGitHub.createBranch(NEW_BRANCH_NAME='', HASH_TO_BRANCH_FROM='9b5b208fb7e12c69e33b27f249706a1c540d6c1e', targetuser='auwsome', repo='pybot',
+				targetbranch='master', username='auwsome')
+
+# check __main__ to run functions now that defined in any order above
+if __name__=="__main__":
+	readFiles()
+	main()
