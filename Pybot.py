@@ -7,37 +7,45 @@ try:
 	import serverSCP as s
 except ImportError,e: print str(e)
 
-print sys.platform
-
+# vars
 global realcwd; realcwd = os.path.dirname(os.path.realpath(__file__))
 global cwd; cwd = os.getcwd()
 #print 'path= ' realcwd
 global dctn; dctn={'is':'equals', 'thing':'something', 'quit':'end loop', 'how':'thing', '?':'question mark', ' ':'space'}
+global commands; commands = None
+global input; input = None
+global args; args = None
+global context; context = None
+
+print sys.platform
 global dictName, cmdsName
 if sys.platform == 'win32': 
 	dictName = realcwd+'\dict.json'
 	cmdsName = realcwd+'\commands.json'
+	#### command line have to prefix running script with 'python'
+	try: 
+		args = sys.argv[1:] 
+		input = " ".join(args)
+		#print input, words, sys.argv[0:], len(sys.argv)
+	except Exception,e: print str(e)
+	global cmdline; 
+	if args: cmdline=1
+	global serverCheck; serverCheck = 0
 if sys.platform == 'android': 
 	dictName = '/storage/sdcard1/dict.json'
 	cmdsName = '/storage/sdcard1/commands.json'
 	import pluginAndroid
+
 	
-def main(input=None, context=None, words=['hi'], commands=[], cmdline=0, server1=0):
-	#### command line
-	if cmdline==1:
-		try: 
-			words = sys.argv[1:] # have to prefix running script with 'python'
-			input = " ".join(words)
-			#print input, words, sys.argv[0:], len(sys.argv)
-		except Exception,e: print str(e)
-		
+def main(*args):
 	#### MAIN LOOP:
-	while input is None:
-		response = None
+	response = None		
+	input = None ## why?
+	while response is None:
 		################### input and convert to list of words
 		
 		#### server, ie Cortana
-		if server1==1:
+		if serverCheck==1:
 			try: 
 				print 'trying'
 				input = str(s.listen())
@@ -123,6 +131,7 @@ def main(input=None, context=None, words=['hi'], commands=[], cmdline=0, server1
 			
 		########################### output
 		if response: print response	
+		if response is None: input = raw_input('anything else?')	
 		
 		if 'hi' in input: print 'hello'
 
@@ -168,7 +177,7 @@ def PBcreateBranch():
 	pluginGitHub.createBranch(NEW_BRANCH_NAME='', HASH_TO_BRANCH_FROM='9b5b208fb7e12c69e33b27f249706a1c540d6c1e', targetuser='auwsome', repo='pybot',
 				targetbranch='master', username='auwsome')
 
-# run functions now that defined in any order above
+# check __main__ to run functions now that defined in any order above
 if __name__=="__main__":
 	readFiles()
 	main()
