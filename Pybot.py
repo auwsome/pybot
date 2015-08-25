@@ -12,7 +12,7 @@ global realcwd; realcwd = os.path.dirname(os.path.realpath(__file__))
 global cwd; cwd = os.getcwd()
 #print 'path= ' realcwd
 global dctn; dctn={'is':'equals', 'thing':'something', 'quit':'end loop', 'how':'thing', '?':'question mark', ' ':'space'}
-global commands; commands = None
+global commands; commands = []
 global input; input = None
 global args; args = None
 global context; context = None
@@ -36,27 +36,32 @@ if sys.platform == 'android':
 	cmdsName = '/storage/sdcard1/commands.json'
 	import pluginAndroid
 
+#### server, ie Cortana
+if serverCheck==1:
+	try: 
+		print 'trying'
+		input = str(s.listen())
+		print 'done'
+	except Exception,e: print 'no server\n'+str(e)
+	
 	
 def main(*args):
+	response = 'hi'	
 	#### MAIN LOOP:
-	response = None		
-	input = None ## why?
-	while response is None:
+	while response is not None:
 		################### input and convert to list of words
 		
-		#### server, ie Cortana
-		if serverCheck==1:
-			try: 
-				print 'trying'
-				input = str(s.listen())
-				print 'done'
-			except Exception,e: print 'no server\n'+str(e)
-		
-		#### text input from terminal
-		if input is None: 
-			input = raw_input('>')
-			try: words = input.split(' ')
-			except: pass
+		#### text input
+		if not response: input = raw_input('>'); 
+		#print 1
+		if response: input = raw_input(response+'\n>'); 
+		#if input == 'y' or 'yes': input = response
+		#print 2
+		# if input is None: 
+			# prompt = response+'>'
+			# input = raw_input('>')
+		try: words = input.split(' ')
+		except: pass
 		
 		#### set context(s)
 		'''if context: 
@@ -67,34 +72,55 @@ def main(*args):
 			#if confirm == 'y':  context = confirm; context = None; input ="okay"'''
 		
 		################### direct commands
-		if input == 'quit': break
+		if input == 'quit': response = None	
 		if input == 'save': PBcreateBranch(); break
-		if input == 'dctn': print dctn; continue
+		if input == 'dctn': response = str(dctn); print response, dctn; continue
+		if 'hi' in input: response = 'hello'
 		
 		################### keyword based commands
 		
 		########## definitions
-		# if 'is' in input and not 'what is' in input and not words[0] == 'is': 
-			# df= input.split(' is ') #definition 
-			# try: dctn[df[0]].append(df[1])
-			# except: pass #dctn[df[0]]=[df[1]]
-			# if df[1] == 'action':
-				# dctn[df[0]]={'action':''}
-				# response = 'how '+ df[0] +"?" 
-				# context = dctn[df[0]]
-			# continue
+		if 'is' in input and not 'what is' in input and not words[0] == 'is': 
+			df= input.split(' is ') #definition 
+			try: dctn[df[0]] = df[1]
+			except: print 'error, not entered' #dctn[df[0]]=[df[1]]
+			if df[1] == 'action':
+				dctn[df[0]]={'action':''}
+				response = 'how '+ df[0] +"?" 
+				context = dctn[df[0]]
+			response = 'okay'
+			#continue
 			
 		if 'is not' in input: 
 			split= input.split(' is not ') #remove definition 
 			try: dctn[split[0]].remove(split[1])
 			except: pass
-			
-		if '?' in input:
-			q = input.split('?') #question
-			print dctn[q[0]]
-			response = dctn[q[0]]
 		
-		########## actions
+		######## question
+		if '?' in input:	
+			input = input.strip('?') 
+			if 'what is' in input:
+				q = input.split('what is ') 
+				#print dctn[q[1]]
+				if q[1] in dctn: response = dctn[q[1]]
+				else: 
+					try: input = "search "+q[1]
+					except: response = q[1]+' is not known'
+				
+		######## google
+		if 'search' in input:
+			input = input.replace('search ','')
+			print "searching "+input
+			from pygoogle import pygoogle
+			g = pygoogle(input)
+			g.pages = 1
+			#print '*Found %s results*'%(g.get_result_count())
+			#print g.search_page_wise()#g.get_urls()
+			#g.display_results()
+			#print g.display_results()
+			response = g.display_results()
+		
+		######## actions
 		if 'e' in input:
 			exec1 = input.split('e ') #exec
 			try: exec(exec1[1]); continue
@@ -127,16 +153,17 @@ def main(*args):
 		
 		########################### catch unknown words
 		for word in words:
-			if word not in dctn:  response = 'what is '+ word +"?"
+			word.strip('?')
+			if word not in dctn and 'is' not in input:  response = 'what is '+ word +"?"
 			
 		########################### output
-		if response: print response	
-		if response is None: input = raw_input('anything else?')	
+		#if response: print response	
+		# if response is None: input = raw_input('anything else?')	
+		print "input="+input
 		
-		if 'hi' in input: print 'hello'
 
 	dumpFiles() 
-	print dctn	  
+	print dctn	 
 	sys.exit()	   
 
 
@@ -149,6 +176,7 @@ def readFiles():
 				if not key in dctn.keys(): dctn[key] = value
 		with open(cmdsName, 'rb') as outfile:
 			commands = json.load(outfile)
+			#print commands
 	except Exception,e: print sys.platform, str(e)
 	
 def dumpFiles():	
