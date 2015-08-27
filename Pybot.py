@@ -65,6 +65,10 @@ def main(*args):
 			# input = raw_input('>')
 		try: words = input.split(' ')
 		except: pass
+		if sys.platform == 'linux-armv71':
+		print 'speaking'
+		droid=android.Android()
+		droid.ttsSpeak(response) 
 		
 		#### set context(s)
 		'''if context: 
@@ -169,10 +173,6 @@ def main(*args):
 		if response is None: YorN = raw_input('anything else?')
 		if YorN == 'y': response = input
 		print "input="+input
-		if sys.platform == 'linux-armv71':
-			print 'speaking'
-			droid=android.Android()
-			droid.ttsSpeak(response) 
 		
 
 	dumpFiles() 
