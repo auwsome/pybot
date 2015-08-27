@@ -29,15 +29,16 @@ if avcomm == "":
 	avcomm = "spotify" #"test"
 
 ###########
-Intent intent2 = new Intent(); intent2.setAction(Intent.ACTION_SEND);
-intent2.setType("text/plain");
-intent2.putExtra(Intent.EXTRA_TEXT, "Your text here" );  
-startActivity(Intent.createChooser(intent2, "Share via"));
+intent2 = droid.makeIntent(); 
+droid.intent2.setAction(Intent.ACTION_SEND);
+droid.intent2.setType("text/plain");
+droid.intent2.putExtra(Intent.EXTRA_TEXT, "Your text here" );  
+droid.startActivity(Intent.createChooser(intent2, "Share via"));
 #taskIntent = droid.makeIntent(intents[avcomm]).result
 #print taskIntent
 #result = droid.sendBroadcastIntent(taskIntent).result
 
-'''	
+
 ## Last Command
 f1=open('./scripts/testfile.py', 'a')
 if avcomm != "redo":
@@ -47,12 +48,7 @@ if avcomm == "redo":
   print "do last=",dctn["last"]
   avcomm = dctn["last"]
   
-'''
-#print droid.prefGetAll()
-  droid.prefGetValue("last")
-  #result = droid.vibrate()
-  ###droid.prefPutValue("last", avcomm) #vcmds.txt #String key, Object value, String filename[optional]: Desired preferences file. If not defined, uses the default Shared Preferences.)
-'''
+
 if avcomm == "out launch":
   f1.write("\n"+str(droid.getLaunchableApplications()))
 
