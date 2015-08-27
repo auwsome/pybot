@@ -241,11 +241,6 @@ regex
 results = map(int, results)
 ","
 '''
-  
-
-
-'''	
-	
 
 
 
