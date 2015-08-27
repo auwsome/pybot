@@ -29,15 +29,17 @@ if avcomm == "":
 	avcomm = "spotify" #"test"
 
 ###########
-intent2 = droid.makeIntent(); 
-droid.intent2.setAction(Intent.ACTION_SEND);
-droid.intent2.setType("text/plain");
-droid.intent2.putExtra(Intent.EXTRA_TEXT, "Your text here" );  
-droid.startActivity(Intent.createChooser(intent2, "Share via"));
+# intent2 = droid.makeIntent(); 
+#droid.intent2.setAction(Intent.ACTION_SEND);
+# droid.intent2.setType("text/plain");
+# droid.intent2.putExtra(Intent.EXTRA_TEXT, "Your text here" );  
+# droid.startActivity(Intent.createChooser(intent2, "Share via"));
 #taskIntent = droid.makeIntent(intents[avcomm]).result
 #print taskIntent
 #result = droid.sendBroadcastIntent(taskIntent).result
 
+text= 'test123' #droid.recognizeSpeech()    
+droid.setClipboard(text.result)
 
 ## Last Command
 f1=open('./scripts/testfile.py', 'a')
