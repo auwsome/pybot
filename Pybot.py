@@ -66,7 +66,7 @@ def main(*args):
 		try: words = input.split(' ')
 		except: pass
 		if sys.platform == 'linux-armv71':
-		print 'speaking'
+			print 'speaking'
 		droid=android.Android()
 		droid.ttsSpeak(response) 
 		
