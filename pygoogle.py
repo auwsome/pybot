@@ -76,27 +76,17 @@ class pygoogle:
 			q = urllib.urlencode(args)
 			search_results = urllib.urlopen(URL+q)
 			data = json.loads(search_results.read())
-			print data
+			#print data
+			summary ={}
 			if True: #print_results:
 				if data['responseStatus'] == 200:
-					i=0;
 					for result in data['responseData']['results']:
-						for i in 3:#if result:
-							i+=1; 
-							data['responseData']['results']['link'] = i
-							print data['responseData']['results']['link']
-							response[i] = {urllib.unquote(result['url'])}
-							response[i]['title2'] = result['titleNoFormatting'].replace("&#39;","'")
-							response[i]['content2'] = result['content'].strip("<b>...</b>").replace("<b>",'').replace("</b>",'').replace("&#39;","'")
-							#print '[%s]'%(urllib.unquote(result['titleNoFormatting']))
-							#print result['titleNoFormatting'].replace("&#39;","'")
-							#print result['content'].strip("<b>...</b>").replace("<b>",'').replace("</b>",'').replace("&#39;","'")
-							#print result['content'].replace("&#39;","'")
-							#print 'from '+urllib.unquote(result['visibleUrl'])+'\n'				
-			results.append(data)
-			#print response
-		#return results
-		return response
+						if result:
+							summary['url'] = {urllib.unquote(result['url'])}
+							summary['title'] = result['titleNoFormatting'].replace("&#39;","'")
+							summary['content'] = result['content'].strip("<b>...</b>").replace("<b>",'').replace("</b>",'').replace("&#39;","'")			
+							results.append(summary)
+		return results
 	
 	def search(self):
 		"""Returns a dict of Title/URLs"""
@@ -160,7 +150,7 @@ class pygoogle:
 if __name__ == "__main__":
 	import sys
 	query = ' '.join(sys.argv[1:])
-	#print pygoogle(' '.join(sys.argv[1:])).display_results()
+	print pygoogle(' '.join(sys.argv[1:])).display_results()
 	g = pygoogle(query)
 	print '*Found %s results*'%(g.get_result_count())
 	g.pages = 1

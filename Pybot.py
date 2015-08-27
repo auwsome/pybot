@@ -112,16 +112,13 @@ def main(*args):
 				
 		######## google
 		if 'search' in input:
-			input = input.replace('search ','')
-			print "searching "+input
+			query = input.replace('search ','')
+			print "searching "+query
 			from pygoogle import pygoogle
-			g = pygoogle(input)
+			g = pygoogle(query)
 			g.pages = 1
-			#print '*Found %s results*'%(g.get_result_count())
-			#print g.search_page_wise()#g.get_urls()
-			#g.display_results()
-			#print g.display_results()
-			response = g.display_results()
+			results = g.__search__()
+			response = str(results)
 			choose=True
 		if choice:
 			print choice
@@ -169,9 +166,11 @@ def main(*args):
 			
 		########################### output
 		#if response: print response	
-		if response is None: YorN = raw_input('anything else?')	
+		if response is None: YorN = raw_input('anything else?')
+		if YorN == 'y': response = input
 		print "input="+input
 		if sys.platform == 'linux-armv71':
+			print 'speaking'
 			droid=android.Android()
 			droid.ttsSpeak(response) 
 		
