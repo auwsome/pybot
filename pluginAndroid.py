@@ -28,8 +28,16 @@ print 'avarr=',avarr
 if avcomm == "":
 	avcomm = "spotify" #"test"
 
+###########
+Intent intent2 = new Intent(); intent2.setAction(Intent.ACTION_SEND);
+intent2.setType("text/plain");
+intent2.putExtra(Intent.EXTRA_TEXT, "Your text here" );  
+startActivity(Intent.createChooser(intent2, "Share via"));
+#taskIntent = droid.makeIntent(intents[avcomm]).result
+#print taskIntent
+#result = droid.sendBroadcastIntent(taskIntent).result
 
-	
+'''	
 ## Last Command
 f1=open('./scripts/testfile.py', 'a')
 if avcomm != "redo":
@@ -240,7 +248,7 @@ results = map(int, results)
   
 
 
-	
+'''	
 	
 
 
