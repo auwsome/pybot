@@ -25,8 +25,8 @@ print( avcomm )
 avcommC = avcomm.title()
 avarr = avcomm.split(" ")
 print 'avarr=',avarr	
-if avcomm == "":
-	avcomm = "spotify" #"test"
+# if avcomm == "":
+	# avcomm = "spotify" #"test"
 
 ###########
 sendAction = "android.intent.action.SEND"
@@ -41,11 +41,8 @@ print 1
 # droid.setClipboard(text.result)
 
 
-
-
-
-
-
+# def ttsSpeak(output):
+	# droid.ttsSpeak(output) 
 
 
 
@@ -193,7 +190,7 @@ if found == '':
 	droid.vibrate()
 if prefs['mute'] != 'true':
 	foundJ = " ".join(found)
-	output = [foundJ, avcomm]
+	output = [foundJ, avcomm, response]
 	outputJ = " ".join(output)
 	print outputJ
 	droid.ttsSpeak(outputJ) 
