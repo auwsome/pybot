@@ -4,6 +4,7 @@ import os, sys, subprocess
 import csv, json
 #import threading
 try:
+	import android
 	import serverSCP as s
 except ImportError,e: print str(e)
 
@@ -34,7 +35,7 @@ if sys.platform == 'win32':
 if sys.platform == 'android': 
 	dictName = '/storage/sdcard1/dict.json'
 	cmdsName = '/storage/sdcard1/commands.json'
-	import pluginAndroid
+	import pluginAndroid as droid
 
 #### server, ie Cortana
 if serverCheck==1:
@@ -119,11 +120,16 @@ def main(*args):
 			#print '*Found %s results*'%(g.get_result_count())
 			#print g.search_page_wise()#g.get_urls()
 			#g.display_results()
-			print g.display_results()
-			#response = g.display_results()
+			#print g.display_results()
+			response = g.display_results()
 			choose=True
 		if choice:
-			print response[choice]
+			print choice
+			if choice == 'next'		: print 1
+			if choice == 'cancel'	: print 2
+			# if choice == 'next': print 1
+			# if choice == 'next': print 1
+			
 		
 		######## actions
 		if 'e' in input:
@@ -165,6 +171,9 @@ def main(*args):
 		#if response: print response	
 		if response is None: YorN = raw_input('anything else?')	
 		print "input="+input
+		if sys.platform == 'linux-armv71':
+			droid=android.Android()
+			droid.ttsSpeak(response) 
 		
 
 	dumpFiles() 
