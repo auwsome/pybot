@@ -3,10 +3,10 @@
 import os, sys, subprocess
 import csv, json
 #import threading
-try:
-	import android
-	import serverSCP as s
-except ImportError,e: print str(e)
+import android
+# try:
+	# import serverSCP as s
+# except ImportError,e: print str(e)
 
 # vars
 global realcwd; realcwd = os.path.dirname(os.path.realpath(__file__))
