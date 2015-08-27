@@ -3,7 +3,9 @@
 import os, sys, subprocess
 import csv, json
 #import threading
+print 1
 import android
+print 2
 # try:
 	# import serverSCP as s
 # except ImportError,e: print str(e)
