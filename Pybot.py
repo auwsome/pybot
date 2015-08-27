@@ -20,6 +20,7 @@ global context; context = None
 
 print sys.platform
 global dictName, cmdsName
+global serverCheck; serverCheck = 0
 if sys.platform == 'win32': 
 	dictName = realcwd+'\dict.json'
 	cmdsName = realcwd+'\commands.json'
@@ -31,7 +32,6 @@ if sys.platform == 'win32':
 	except Exception,e: print str(e)
 	global cmdline; 
 	if args: cmdline=1
-	global serverCheck; serverCheck = 0
 if sys.platform == 'android': 
 	dictName = '/storage/sdcard1/dict.json'
 	cmdsName = '/storage/sdcard1/commands.json'
