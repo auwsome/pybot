@@ -29,17 +29,29 @@ if avcomm == "":
 	avcomm = "spotify" #"test"
 
 ###########
-intent2 = droid.makeIntent(); 
+# intent = droid.makeIntent(); 
 #droid.intent2.setAction(Intent.ACTION_SEND);
 # droid.intent2.setType("text/plain");
 # droid.intent2.putExtra(Intent.EXTRA_TEXT, "Your text here" );  
-droid.startActivity(Intent.createChooser(intent2, "Share via"));
+#droid.startActivity(Intent.createChooser(intent2, "Share via"));
 #taskIntent = droid.makeIntent(intents[avcomm]).result
 #print taskIntent
 #result = droid.sendBroadcastIntent(taskIntent).result
+sendAction = "android.intent.action.SEND"
+sendUriType = "text/plain"
+sendExtras = {"EXTRA_TEXT":"my message", "EXTRA_SUBJECT":"and my subject"}
+sendIntent = droid.makeIntent(sendAction, None, sendUriType, sendExtras,
+                              None, None, None, None).result
 
+chooseAction = "android.intent.action.CHOOSER"
+chooseExtras = {"EXTRA_INTENT":sendIntent}
+chooseIntent = droid.makeIntent(chooseAction, None, None, chooseExtras,
+                                None, None, None, None).result
+
+droid.startActivityIntent(chooseIntent)
+print 1
 activity = 'Intent.ACTION_SEND'#'Intents.Insert.ACTION'
-type = 'ContactsContract.RawContacts.CONTENT_TYPE'
+# type = 'ContactsContract.RawContacts.CONTENT_TYPE'
 extras = {}
 extras['type '] = 'text/plain'
 extras['EXTRA_TEXT'] = 'Your text here'
@@ -255,5 +267,16 @@ results = map(int, results)
 ","
 '''
 
+'''
+activity = 'com.googlecode.android_scripting.action.LAUNCH_BACKGROUND_SCRIPT'
+extras = {}
+extras['com.googlecode.android_scripting.extra.SCRIPT_PATH'] = '/any/script/you/like.py'
 
+packagename =  'com.googlecode.android_scripting'
+classname = 'com.googlecode.android_scripting.activity.ScriptingLayerServiceLauncher'
+
+intent = droid.makeIntent(activity, None, None, extras, None, packagename, classname).result
+
+droid.startActivityIntent(intent)
+'''
 
