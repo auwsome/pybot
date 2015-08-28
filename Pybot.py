@@ -1,12 +1,8 @@
 # from https://github.com/auwsome/pybot
-print 1
 import os, sys, subprocess
-print 2
 import csv, json
 #import threading
-print 1b
 import android
-print 2b
 # try:
 	# import serverSCP as s
 # except ImportError,e: print str(e)
