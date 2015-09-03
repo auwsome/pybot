@@ -82,7 +82,7 @@ class pygoogle:
 				if data['responseStatus'] == 200:
 					for result in data['responseData']['results']:
 						if result:
-							summary['url'] = {urllib.unquote(result['url'])}
+							summary['url'] = (result['url'])
 							summary['title'] = result['titleNoFormatting'].replace("&#39;","'")
 							summary['content'] = result['content'].strip("<b>...</b>").replace("<b>",'').replace("</b>",'').replace("&#39;","'")			
 							results.append(summary)
