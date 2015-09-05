@@ -29,7 +29,6 @@ if input == 'quit': run = False; print 2
 if input == 'undo': list1.pop(); print list1
 if input == 'undo prepend': list1.pop(0);#input = '';
 if 'prepend ' in input: p = input.lstrip('prepend '); list1.insert(0, p); input = '';
-if input == 'list': print list1
 
 
 #if tts: print 2

@@ -3,7 +3,6 @@ print 'init'
 import os, sys, subprocess, time
 import csv, json, urllib2
 import mechanize
-import bs4
 try:
 	import pyttsx
 	import serverSCP as s
@@ -49,6 +48,8 @@ print sys.platform
 #### win32+'>')"
 # btw, command line needs to have prefix running script with 'python'
 if sys.platform == 'win32': 
+	from bs4 import BeautifulSoup
+	#import bs4 as BeautifulSoup
 	dictName = realcwd+'\dict.json'
 	cmdsName = realcwd+'\commands.json'
 	prompt='p>'
@@ -90,203 +91,199 @@ if serverCheck==1:
 #input=""
 #print input
 def main(input=input, *args):
-	response=None; choose=False; choice="go"; YorN=None; words = ['']; chunk=0; link=0
+	response=None; choose=False; choice=""; YorN=None; words = ['']; chunk=0; link=0; more=0; responseSplit=True; responseChunks=[]
 	global droid, prompt, tts
 	exec('with open(storageFile) as file: list1 = file.readlines()')
 	#### MAIN LOOP:
 	#while response is not "":
 	while True:
-	
-		################### input and convert to list of words
-		#print 'input1=',repr(input), "response1=",response #, "choice=",choice
-		
-		while input == "" or not input or input is None:
-			# input = droid.recognizeSpeech().result
-			# if not response: print 'noresponse'; input = droid.recognizeSpeech().result#exec(channel)
-			# if choose: print 'choose'; prompt = choice; choice = droid.recognizeSpeech().result; input="choose"#exec(channel)
-			# if not choose and response: input = droid.recognizeSpeech().result # prompt = response+'>'; exec(channel)
-			if not response: prompt = '>'; exec(channel)
-			#if not choose: prompt = '>'; exec(channel)
-			if choose: print 'choose'; prompt = choice; exec(channel)
+		try:
+			################### input and convert to list of words
+			#print 'input1=',repr(input), "response1=",response #, "choice=",choice
 			
-			if input is None: time.sleep(7); print 'input is None'; input=""; exec(channel)
-			#else: print "input2=",input;
+			while input == "" or not input or input is None:
+				# input = droid.recognizeSpeech().result
+				# if not response: print 'noresponse'; input = droid.recognizeSpeech().result#exec(channel)
+				# if choose: print 'choose'; prompt = choice; choice = droid.recognizeSpeech().result; input="choose"#exec(channel)
+				# if not choose and response: input = droid.recognizeSpeech().result # prompt = response+'>'; exec(channel)
+				if not response: prompt = '>'; exec(channel)
+				#if not choose: prompt = '>'; exec(channel)
+				if choose: print 'choose'; prompt = choice; exec(channel); choice = input.strip('\r'); input = ''; print choice; break
+				
+				if input is None: time.sleep(7); print 'input is None'; input=""; exec(channel)
+				#else: print "input2=",input;
+				
+			input = input.strip('\r')	
+			#if input == 'set': continue
+			# if input == 'loop': response = mainLoop()
 			
-		input = input.strip('\r')	
-		#if input == 'set': continue
-		# if input == 'loop': response = mainLoop()
-		
-		# run=True; tts=False
-		# global response; reponse = True
-		# code='';i=0
-		# input = raw_input('yes?\n').strip('\r'); print repr(input)
-		#input = input.strip('\r'); print repr(input)
-		for index,item in enumerate(list1):
-			try:
-				exec(list1[index]);#print i;i=i+1
-			except Exception,e: pass#print 'err', str(e)
+			# run=True; tts=False
+			# global response; reponse = True
+			# code='';i=0
+			# input = raw_input('yes?\n').strip('\r'); print repr(input)
+			#input = input.strip('\r'); print repr(input)
+			for index,item in enumerate(list1):
+				try:
+					exec(list1[index]);#print i;i=i+1
+				except Exception,e: pass#print 'err', str(e)
 
-		
-		try: words = input.split(' ')
-		except: pass
-		
-		#### set context(s)
-		'''if context: 
-			phrase2 = raw_input(str(context)+ ' is ')
-			context['action'] = phrase2; context = None
-			print dctn[df[0]]['action']
-			#confirm = raw_input('confirm?')
-			#if confirm == 'y':  context = confirm; context = None; input ="okay"'''
-		
-		################### direct commands
-		# if input == 'quit': response = ""
-		if input == 'quit': break
-		if input == 'load': exec('with open(storageFile) as file: list1 = file.readlines()')
-		if input == 'dump': exec('with open(storageFile, "wb") as file: file.writelines(list1)')
-		if input == 'save': PBcreateBranch(); break
-		if input == 'dctn': response = str(dctn); print response, dctn; continue
-		if input == "hi": response = 'hello';
-		# if prompt == 'anything else? (yes/no)>':
-			# if YorN == 'yes': pass
-			# if YorN == 'no': break
-		
-		################### keyword based commands
-		
-		########## parsing phrase
-		if ' is ' in input and not 'what is ' in input and not words[0] == 'is': 
-			df = input.split(' is ') #definition 
-			try: dctn[df[0]] = df[1]
-			except: print 'error, not entered' #dctn[df[0]]=[df[1]]
-			if df[1] == 'action':
-				dctn[df[0]]={'action':''}
-				response = 'how '+ df[0] +"?" 
-				context = dctn[df[0]]
-			response = 'okay'
-			#continue
 			
-		if ' is not ' in input: 
-			split= input.split(' is not ') #remove definition 
-			try: dctn[split[0]].remove(split[1])
+			try: words = input.split(' ')
 			except: pass
-		
-		######## question
-		if '?' in input:	
-			input = input.strip('?') 
-			if 'what is' in input:
-				q = input.split('what is ') 
-				#print dctn[q[1]]
-				if q[1] in dctn: response = dctn[q[1]]
-				else: 
-					try: input = "search "+q[1]
-					except: response = q[1]+' is not known'
+			
+			#### set context(s)
+			'''if context: 
+				phrase2 = raw_input(str(context)+ ' is ')
+				context['action'] = phrase2; context = None
+				print dctn[df[0]]['action']
+				#confirm = raw_input('confirm?')
+				#if confirm == 'y':  context = confirm; context = None; input ="okay"'''
+			
+			################### direct commands
+			# if input == 'quit': response = ""
+			if input == 'quit': break
+			if input == 'load': exec('with open(storageFile) as file: list1 = file.readlines()')
+			if input == 'dump': exec('with open(storageFile, "wb") as file: file.writelines(list1)')
+			if input == 'save': PBcreateBranch(); break
+			if input == 'dctn': response = str(dctn); print response, dctn; continue
+			if input == 'done':	choose = False
+			if input == 'go':  go()
+			#if input == "hi": response = 'hello';
+			# if prompt == 'anything else? (yes/no)>':
+				# if YorN == 'yes': pass
+				# if YorN == 'no': break
+			
+			################### keyword based commands
+			
+			########## parsing phrase
+			if ' is ' in input and not 'what is ' in input and not words[0] == 'is': 
+				df = input.split(' is ') #definition 
+				try: dctn[df[0]] = df[1]
+				except: print 'error, not entered' #dctn[df[0]]=[df[1]]
+				if df[1] == 'action':
+					dctn[df[0]]={'action':''}
+					response = 'how '+ df[0] +"?" 
+					context = dctn[df[0]]
+				response = 'okay'
+				#continue
 				
-		######## google
-		if 'search' in input:
-			query = input.replace('search ','')
-			print "searching "+query
-			from pygoogle import pygoogle
-			g = pygoogle(query)
-			g.pages = 1
-			results = g.__search__(); #print str(results)
-			choose=True; 
-			response = results[link]['content']; #response = repr(response)
-			response.encode('ascii')
-			#response.encode('ascii', 'ignore'); 
+			if ' is not ' in input: 
+				split= input.split(' is not ') #remove definition 
+				try: dctn[split[0]].remove(split[1])
+				except: pass
 			
-		##################################################################################################################################	
-		if choose:
-			print 'chooseTrue'
-			if choice == 'next': 
-				link=link+1; print 'link=',link
-				response = results[link]['content']; #response = repr(response)
-				response.encode('ascii')
-			if choice == 'go': 
-				br = mechanize.Browser()
-				br.set_handle_robots(False)
-				br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]  
-				page = br.open(url); 
-				response = page.read()
-				soup = BeautifulSoup(response, "html.parser"); 
-				#paras=soup.p #findAll('p', text=True)
-				VALID_TAGS = ['p','span']		#, 'ul', 'li', 'br']'div',
-				paras = [i.text.encode('ascii',"ignore") for i in soup.find_all(VALID_TAGS)] ################## removes <p>s
-				paras = filter(None, paras)
-				paras = [i.replace('\n','.').replace('\r','.') for i in paras] 
-				paras = [i.replace('(','parens').replace(')','parens').replace('[','bracket').replace(']','bracket') for i in paras] 
+			######## question
+			if '?' in input:	
+				input = input.strip('?') 
+				if 'what is' in input:
+					q = input.split('what is ') 
+					#print dctn[q[1]]
+					if q[1] in dctn: response = dctn[q[1]]
+					else: 
+						try: input = "search "+q[1]
+						except: response = q[1]+' is not known'
+					
+			######## google
+			if 'search' in input:
+				try:
+					query = input.replace('search ','')
+					print "searching "+query
+					from pygoogle import pygoogle
+					g = pygoogle(query)
+					g.pages = 1
+					results = g.__search__(); 
+					choose=True; 
+					response = results[link]['content']; #response = repr(response)
+					response.encode('ascii', 'ignore').replace('\n','')
+					url = list(results[link]['url'])[0]; print url
+					#response.encode('ascii', 'ignore'); 
+				except Exception,e: print str(e)
+				#print str(results)
+				
+			##################################################################################################################################	
+			if choose:
+				print 'chooseTrue'
+				if choice == 'next': 
+					link=link+1; print 'link=',link
+					response = results[link]['content']; #response = repr(response)
+					response.encode('ascii')
+				print choice
+				if choice == 'go':  go(url)
+				
+			######## actions
+			if 'e' in input:
+				exec1 = input.split('e ') #exec
+				try: exec(exec1[1]); continue
+				except Exception,e: print str(e)
 			
-				input = raw_input('pause')
+			if 'do' in input: #action
+				try: 
+					exec(dctn[words[1]]['action']+' "'+str(''.join(words[2:99]))+'"'); continue
+				except Exception,e: print str(e)
 			
-		######## actions
-		if 'e' in input:
-			exec1 = input.split('e ') #exec
-			try: exec(exec1[1]); continue
-			except Exception,e: print str(e)
-		
-		if 'do' in input: #action
-			try: 
-				exec(dctn[words[1]]['action']+' "'+str(''.join(words[2:99]))+'"'); continue
-			except Exception,e: print str(e)
-		
-		print 'words=',words	
-		if words[0] and words[0] in commands:
-			try: 
-				vcommand = words[0]
-				try: context = words.get([1])
-				except: print '1'
-				command = commands[vcommand][context]
-				pcommand = commands[vcommand]['print']
-				print vcommand,words[0],pcommand
-				print vcommand,context,command
-				if pcommand is not None:
-					input = raw_input(pcommand+' "'+str(''.join(words[2:99]))+'"? ')
-					if not input == ('y' or 'yes'): break
-					exec(pcommand+' "'+str(''.join(words[2:99]))+'"')
-				if commands[vcommand]['windows'] is not None or context == 'windows':
-					process = subprocess.Popen(commands[vcommand]['windows'], shell=True, stdout=subprocess.PIPE)
-					#subprocess.Popen("rundll32.exe powrprof.dll,SetSuspendState 0,1,0", shell=True, stdout=subprocess.PIPE)
-					process.wait(); print process.returncode
-			except Exception,e: print '3'+str(e)
-			continue
-		
-		########################### catch unknown words
-		# if words[0]:
-			# for word in words:
-				# word.strip('?')
-				# if word not in dctn and 'is' not in input:  response = 'what is '+ word +"?"
+			print 'words=',words	
+			if words[0] and words[0] in commands:
+				try: 
+					vcommand = words[0]
+					try: context = words.get([1])
+					except: print '1'
+					command = commands[vcommand][context]
+					pcommand = commands[vcommand]['print']
+					print vcommand,words[0],pcommand
+					print vcommand,context,command
+					if pcommand is not None:
+						input = raw_input(pcommand+' "'+str(''.join(words[2:99]))+'"? ')
+						if not input == ('y' or 'yes'): break
+						exec(pcommand+' "'+str(''.join(words[2:99]))+'"')
+					if commands[vcommand]['windows'] is not None or context == 'windows':
+						process = subprocess.Popen(commands[vcommand]['windows'], shell=True, stdout=subprocess.PIPE)
+						#subprocess.Popen("rundll32.exe powrprof.dll,SetSuspendState 0,1,0", shell=True, stdout=subprocess.PIPE)
+						process.wait(); print process.returncode
+				except Exception,e: print '3'+str(e)
+				continue
 			
-		
-		
-		########################### output
-		# if response: print 'endresponse=',response
-		# else: prompt = 'anything else? (yes/no)>'
-		
-		if choose:
-			print 'choose = ', choose
-			print 'choice = ', choice
-			if choice == 'cancel'	: choose = False
-			if choice == 'more'		: chunk = chunk+1
-			
-			
-		if tts and response: 
-			span = 8; 
-			if len(response.split(' ')) > span: 
-				responseList = response.split(' ')
-				responseChunks = [" ".join(responseList[i:i+span]) for i in range(0, len(responseList)-span, span)]
-				response = responseChunks[chunk]
-				#i = 0; chunk = []; j = 0; responseChunks = []
-				#for item in responseList:
-					#if i < 4:
-					#	chunk.append(item); i=i+1
-					#responseChunks.append(chunk)
+			########################### catch unknown words
+			# if words[0]:
+				# for word in words:
+					# word.strip('?')
+					# if word not in dctn and 'is' not in input:  response = 'what is '+ word +"?"
 				
 			
-		#print "endinput="+input
-		input=""
-		print response
-		if tts: 
-			print 'speaking'; 
-			exec(responseChannel) 
-		if not choose: response = ''
+			
+			########################### output
+			# if response: print 'endresponse=',response
+			# else: prompt = 'anything else? (yes/no)>'
+			
+			if choose:
+				print 'choose = ', choose
+				print 'choice = ', choice
+				if choice == 'cancel': choose = False
+				if choice == 'more': more = more+1; response=' '.join(responseChunks[more])
+				print 'more = ', more
+				if more == len(responseChunks): print 'no more'; #choose = False
+				
+				
+			if tts and response and responseSplit: 
+				responseSplit = response.split(' '); span = 6
+				if len(responseSplit) > span: 
+					print 'chunking'
+					i=0; chunk=[]; responseChunks=[]
+					for item in responseSplit:
+						if i < span: chunk.append(item); i=i+1; #print i
+						if i == span: responseChunks.append(chunk); i=0; chunk=[]
+					responseChunks.append(chunk)
+					response=' '.join(responseChunks[0]); responseSplit=False
+					print responseChunks
+					
+				
+			#print "endinput="+input
+			input=""
+			print response
+			if tts: 
+				print 'speaking'; 
+				exec(responseChannel) 
+			if not choose: response = ''
+		except Exception,e: print 'main='+str(e)
 
 	dumpFiles() 
 	print dctn	 
@@ -294,7 +291,22 @@ def main(input=input, *args):
 
 
 
+def go(url='http://www.google.com'):
+	print 'going to.. ',url
+	br = mechanize.Browser()
+	br.set_handle_robots(False)
+	br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]  
+	page = br.open(url); 
+	response = page.read(); print response[0:100]
+	soup = BeautifulSoup(response, "html.parser"); 
+	#paras=soup.p #findAll('p', text=True)
+	VALID_TAGS = ['p','span']		#, 'ul', 'li', 'br']'div',
+	paras = [i.text.encode('ascii',"ignore") for i in soup.find_all(VALID_TAGS)] ################## removes <p>s
+	paras = filter(None, paras)
+	paras = [i.replace('\n','.').replace('\r','.') for i in paras] 
+	paras = [i.replace('(','parens').replace(')','parens').replace('[','bracket').replace(']','bracket') for i in paras] 
 
+	input = raw_input('pause')
 
 
 
