@@ -147,7 +147,7 @@ def main(input=input, *args):
 			if input == 'save': PBcreateBranch(); break
 			if input == 'dctn': response = str(dctn); print response, dctn; continue
 			if input == 'done':	choose = False
-			if input == 'go':  go()
+			if input == 'go': response = " ".join(go())
 			#if input == "hi": response = 'hello';
 			# if prompt == 'anything else? (yes/no)>':
 				# if YorN == 'yes': pass
@@ -200,7 +200,7 @@ def main(input=input, *args):
 				except Exception,e: print str(e)
 				#print str(results)
 				
-			##################################################################################################################################	
+			######## browse
 			if choose:
 				print 'chooseTrue'
 				if choice == 'next': 
@@ -208,7 +208,7 @@ def main(input=input, *args):
 					response = results[link]['content']; #response = repr(response)
 					response.encode('ascii')
 				print choice
-				if choice == 'go':  go(url)
+				if choice == 'go':  response = " ".join(go(url))
 				
 			######## actions
 			if 'e' in input:
@@ -258,9 +258,14 @@ def main(input=input, *args):
 				print 'choose = ', choose
 				print 'choice = ', choice
 				if choice == 'cancel': choose = False
-				if choice == 'more': more = more+1; response=' '.join(responseChunks[more])
-				print 'more = ', more
-				if more == len(responseChunks): print 'no more'; #choose = False
+				if choice == 'more': 
+					more = more+1; 
+					if responseChunks[more]: 
+						response=' '.join(responseChunks[more])
+						print 'more = ', more
+					else: print 'no more'
+					if more == len(responseChunks): print 'no more'; #choose = False
+					print 2, responseChunks
 				
 				
 			if tts and response and responseSplit: 
@@ -297,7 +302,7 @@ def go(url='http://www.google.com'):
 	br.set_handle_robots(False)
 	br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]  
 	page = br.open(url); 
-	response = page.read(); print response[0:100]
+	response = page.read(); #print response[0:100]
 	soup = BeautifulSoup(response, "html.parser"); 
 	#paras=soup.p #findAll('p', text=True)
 	VALID_TAGS = ['p','span']		#, 'ul', 'li', 'br']'div',
@@ -305,8 +310,9 @@ def go(url='http://www.google.com'):
 	paras = filter(None, paras)
 	paras = [i.replace('\n','.').replace('\r','.') for i in paras] 
 	paras = [i.replace('(','parens').replace(')','parens').replace('[','bracket').replace(']','bracket') for i in paras] 
-
-	input = raw_input('pause')
+	#print paras[0:100]
+	#input = raw_input('pause')
+	return paras
 
 
 
