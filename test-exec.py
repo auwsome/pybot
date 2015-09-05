@@ -19,19 +19,26 @@ def loop():
 			exec(list1[index]);#print i;i=i+1
 		except Exception,e: pass#print 'err', str(e)
 	return run
-		
-while True:
-	try:
-		list1 = load(); print list1
-		while run: 
-			if loop(): pass
-			else: 
-				run = False
-				input = raw_input('save?')
-				if input == 'y': 
-					with open('test.py', 'wb') as file: 
-						file.writelines(list1)
-	except Exception,e: print str(e)
-	input = raw_input('q?');print repr(input)
-	if input == 'n\r': run = True
-	if input == 'y\r': run = False; break
+
+def mainLoop():
+	while True:
+		try:
+			list1 = load(); print list1
+			while run: 
+				if loop(): pass
+				else: 
+					run = False
+					input = raw_input('save?')
+					if input == 'y': 
+						with open('test.py', 'wb') as file: 
+							file.writelines(list1)
+		except Exception,e: print str(e)
+		input = raw_input('q?');print repr(input)
+		if input == 'n\r': run = True
+		if input == 'y\r': run = False; break
+
+	
+	
+# check __main__ to run functions now that defined in any order above
+if __name__=="__main__":
+	mainLoop()

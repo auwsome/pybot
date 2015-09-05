@@ -4,15 +4,18 @@ import os, sys, subprocess, time
 import csv, json, urllib2
 import mechanize
 import bs4
-#import threading
-# try:
-	# import serverSCP as s
-# except ImportError,e: print str(e)
+try:
+	import pyttsx
+	import serverSCP as s
+except ImportError,e: print str(e)
+engine = pyttsx.init()
+#engine.say('Sally sells seashells by the seashore.'); engine.runAndWait()
 
+#import PybotX as pbx
+global tts
+storageFile = 'PybotLines.py'
 
-
-
-# vars
+#### vars
 global realcwd; realcwd = os.path.dirname(os.path.realpath(__file__))
 global cwd; cwd = os.getcwd()
 #print 'path= ' realcwd
@@ -23,39 +26,15 @@ global args; args = None
 global context; context = None
 global prompt; prompt = 'test'
 global channel; channel = 'raw_input('+prompt+'<>)'
-print sys.platform
+tts = False
 global dictName, cmdsName
 global serverCheck; serverCheck = 0
 global cmdline; 
-if sys.platform == 'win32': 
-	dictName = realcwd+'\dict.json'
-	cmdsName = realcwd+'\commands.json'
-	#### command line have to prefix running script with 'python'
-	
+global droid, d; droid=None
 
 
 
-global droid, d, tts 
-######## check and set environment
-if True or 'arm' in sys.platform:# == 'linux-armv71': 
-	dictName = '/storage/sdcard1/dict.json'
-	cmdsName = '/storage/sdcard1/commands.json'
-	import android 
-	from BeautifulSoup import BeautifulSoup
-	droid = android.Android(); d = droid
-	tts = True
-	channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
-	args = droid.getIntent().result[u'extras']
-	print args
-	if args: input = args['%avcomm']; print input
 
-#### server, ie Cortana
-if serverCheck==1:
-	try: 
-		print 'trying'
-		input = str(s.listen())
-		print 'done'
-	except Exception,e: print 'no server\n'+str(e)
 
 if sys.argv[1:]:
 	try: 
@@ -65,32 +44,89 @@ if sys.argv[1:]:
 		input = " ".join(args)
 		print input, sys.argv[0:], len(sys.argv)
 	except Exception,e: print str(e)
+######## check and set environment
+print sys.platform
+#### win32+'>')"
+# btw, command line needs to have prefix running script with 'python'
+if sys.platform == 'win32': 
+	dictName = realcwd+'\dict.json'
+	cmdsName = realcwd+'\commands.json'
+	prompt='p>'
+	tts = True
+	channel = "input = raw_input(prompt)"
+	if tts:	responseChannel = 'engine.say(response); engine.runAndWait()'
+#### android
+if 'arm' in sys.platform:# == 'linux-armv71': 
+	dictName = '/storage/sdcard1/dict.json'
+	cmdsName = '/storage/sdcard1/commands.json'
+	import android 
+	from BeautifulSoup import BeautifulSoup
+	droid = android.Android(); d = droid
+	tts = True
+	#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
+	channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech().result'
+	args = droid.getIntent().result[u'extras']
+	print args
+	if args: input = args['%avcomm']; print input
+	responseChannel = 'droid.ttsSpeak(response);while droid.ttsIsSpeaking().result: pass'
+	#responseChannel = 
+	# ttsResponse = 'droid.ttsSpeak(response)'
+	# ttsWait = 'while droid.ttsIsSpeaking().result: pass'
+#if os.name == 'posix': 
+#### server, ie Cortana
+if serverCheck==1:
+	try: 
+		print 'trying'
+		channel = "input = str(s.listen())"
+		print 'success'
+	except Exception,e: print 'no server\n'+str(e)
 
-#input=""
-print input
-def main(input=input, *args):
-	response='hi'; choose=False; choice="go"; YorN=None; words = ['']; chunk=0; link=0
-	global droid, prompt
+
 	
+	
+
+	
+	
+#input=""
+#print input
+def main(input=input, *args):
+	response=None; choose=False; choice="go"; YorN=None; words = ['']; chunk=0; link=0
+	global droid, prompt, tts
+	exec('with open(storageFile) as file: list1 = file.readlines()')
 	#### MAIN LOOP:
-	while response is not "":
+	#while response is not "":
+	while True:
 	
 		################### input and convert to list of words
-		print 'input1='+input, "response1="+response #, "choice="+choice
+		#print 'input1=',repr(input), "response1=",response #, "choice=",choice
 		
-		while input == "" or input == 'nospeech' or input is None:
-			input = droid.recognizeSpeech().result
-			if not response: print 'noresponse'; input = droid.recognizeSpeech().result#exec(channel)
-			if choose: print 'choose'; prompt = choice; choice = droid.recognizeSpeech().result; input="choose"#exec(channel)
-			if not choose and response: input = droid.recognizeSpeech().result # prompt = response+'>'; exec(channel)
+		while input == "" or not input or input is None:
+			# input = droid.recognizeSpeech().result
+			# if not response: print 'noresponse'; input = droid.recognizeSpeech().result#exec(channel)
+			# if choose: print 'choose'; prompt = choice; choice = droid.recognizeSpeech().result; input="choose"#exec(channel)
+			# if not choose and response: input = droid.recognizeSpeech().result # prompt = response+'>'; exec(channel)
+			if not response: prompt = '>'; exec(channel)
+			#if not choose: prompt = '>'; exec(channel)
+			if choose: print 'choose'; prompt = choice; exec(channel)
 			
-			if input is None: time.sleep(7);  input="";  #print 2 #exec(channel)
-			else: print "input2=",input;
-		 
-		#exec('print 2')
-		# if input is None: 
-			# prompt = response+'>'
-			# input = raw_input('>')
+			if input is None: time.sleep(7); print 'input is None'; input=""; exec(channel)
+			#else: print "input2=",input;
+			
+		input = input.strip('\r')	
+		#if input == 'set': continue
+		# if input == 'loop': response = mainLoop()
+		
+		# run=True; tts=False
+		# global response; reponse = True
+		# code='';i=0
+		# input = raw_input('yes?\n').strip('\r'); print repr(input)
+		#input = input.strip('\r'); print repr(input)
+		for index,item in enumerate(list1):
+			try:
+				exec(list1[index]);#print i;i=i+1
+			except Exception,e: pass#print 'err', str(e)
+
+		
 		try: words = input.split(' ')
 		except: pass
 		
@@ -103,17 +139,20 @@ def main(input=input, *args):
 			#if confirm == 'y':  context = confirm; context = None; input ="okay"'''
 		
 		################### direct commands
-		if input == 'quit': response = ""
+		# if input == 'quit': response = ""
+		if input == 'quit': break
+		if input == 'load': exec('with open(storageFile) as file: list1 = file.readlines()')
+		if input == 'dump': exec('with open(storageFile, "wb") as file: file.writelines(list1)')
 		if input == 'save': PBcreateBranch(); break
 		if input == 'dctn': response = str(dctn); print response, dctn; continue
-		if input == "hi": response = 'hello'
-		if prompt == 'anything else? (yes/no)>':
-			if YorN == 'yes': pass
-			if YorN == 'no': break
+		if input == "hi": response = 'hello';
+		# if prompt == 'anything else? (yes/no)>':
+			# if YorN == 'yes': pass
+			# if YorN == 'no': break
 		
 		################### keyword based commands
 		
-		########## definitions
+		########## parsing phrase
 		if ' is ' in input and not 'what is ' in input and not words[0] == 'is': 
 			df = input.split(' is ') #definition 
 			try: dctn[df[0]] = df[1]
@@ -177,8 +216,6 @@ def main(input=input, *args):
 			
 				input = raw_input('pause')
 			
-			
-			
 		######## actions
 		if 'e' in input:
 			exec1 = input.split('e ') #exec
@@ -220,8 +257,8 @@ def main(input=input, *args):
 		
 		
 		########################### output
-		if response: print 'endresponse=',response
-		else: prompt = 'anything else? (yes/no)>'
+		# if response: print 'endresponse=',response
+		# else: prompt = 'anything else? (yes/no)>'
 		
 		if choose:
 			print 'choose = ', choose
@@ -230,14 +267,8 @@ def main(input=input, *args):
 			if choice == 'more'		: chunk = chunk+1
 			
 			
-			
-			
-		if os.name == 'posix': 
-			tts = True #sys.platform == 'linux-armv71':
-			ttsResponse = 'droid.ttsSpeak(response)'
-			ttsWait = 'while droid.ttsIsSpeaking().result: pass'
-		span = 4; 
-		if tts: 
+		if tts and response: 
+			span = 8; 
 			if len(response.split(' ')) > span: 
 				responseList = response.split(' ')
 				responseChunks = [" ".join(responseList[i:i+span]) for i in range(0, len(responseList)-span, span)]
@@ -248,11 +279,14 @@ def main(input=input, *args):
 					#	chunk.append(item); i=i+1
 					#responseChunks.append(chunk)
 				
-			print 'speaking'; 
-			exec(ttsResponse) ; exec(ttsWait) 
 			
-		print "endinput="+input
+		#print "endinput="+input
 		input=""
+		print response
+		if tts: 
+			print 'speaking'; 
+			exec(responseChannel) 
+		if not choose: response = ''
 
 	dumpFiles() 
 	print dctn	 
@@ -264,10 +298,47 @@ def main(input=input, *args):
 
 
 
+def load():
+	with open(storageFile) as file:
+		list1 = file.readlines()
+	return list1
+
+def loop():
+	run=True; tts=False
+	global response; reponse = True
+	code='';i=0
+	input = raw_input('yes?\n').strip('\r'); print repr(input)
+	#input = input.strip('\r'); print repr(input)
+	for index,item in enumerate(list1):
+		try:
+			exec(list1[index]);#print i;i=i+1
+		except Exception,e: pass#print 'err', str(e)
+	return response
+
+def mainLoop():
+	global response; reponse = True
+	while True:
+		try:
+			global list1; list1 = load(); print list1[0:3]
+			while reponse: 
+				if loop(): return response
+				#if main(): pass
+				else: 
+					run = False
+					input = raw_input('save?')
+					if input == 'y': 
+						with open(storageFile, 'wb') as file: 
+							file.writelines(list1)
+		except Exception,e: print str(e)
+		input = raw_input('q?');print repr(input)
+		if input == 'n\r': run = True
+		if input == 'y\r': run = False; break
 
 
 
-
+		
+		
+		
 
 def readFiles():
 	try: 
