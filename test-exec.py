@@ -3,20 +3,21 @@
 run = True
 code=''
 input=True
+global tts
 
 def load():
 	with open('test.py') as file:
 		list1 = file.readlines()
 	return list1
 
-
 def loop():
-	code='';
-	run=True
-	global tts; tts=False
-	input = raw_input('yes?'); print input
+	run=True; tts=False
+	code='';i=0
+	input = raw_input('yes?\n').strip('\r'); print repr(input)
 	for index,item in enumerate(list1):
-		exec(list1[index])
+		try:
+			exec(list1[index]);#print i;i=i+1
+		except Exception,e: pass#print 'err', str(e)
 	return run
 		
 while True:
@@ -31,6 +32,6 @@ while True:
 					with open('test.py', 'wb') as file: 
 						file.writelines(list1)
 	except Exception,e: print str(e)
-	input = raw_input('q?')
-	if input == 'n': run = True
-	if input == 'y': break
+	input = raw_input('q?');print repr(input)
+	if input == 'n\r': run = True
+	if input == 'y\r': run = False; break

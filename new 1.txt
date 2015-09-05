@@ -23,7 +23,9 @@
  u'currentPageIndex': 0},
  
  
- u'results': [{u'GsearchResultClass': u'GwebSearch',
+ u'results': 
+ [{
+ u'GsearchResultClass': u'GwebSearch',
  u'visibleUrl': u'finance.yahoo.com',
  u'titleNoFormatting': u'DF: Summary for Dean Foods Company Common Stock- Yahoo ...',
  u'title': u'<b>DF</b>: Summary for <b>Dean Foods</b> Company Common Stock- Yahoo <b>...</b>',
@@ -32,6 +34,8 @@
  u'unescapedUrl': u'http://finance.yahoo.com/q?s=DF',
  u'content': u'View the basic <b>DF</b> stock chart on Yahoo! Finance. Change the date range,
  chart \ntype and compare <b>Dean Foods</b> Company Common Stock against other\xa0...'},
+ 
+ 
  {u'GsearchResultClass': u'GwebSearch',
  u'visibleUrl': u'en.wikipedia.org',
  u'titleNoFormatting': u'df (Unix) - Wikipedia,
