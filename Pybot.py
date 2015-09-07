@@ -93,6 +93,7 @@ if serverCheck==1:
 #print input
 def main(input=input, *args):
 	response=None; choose=False; choice=""; YorN=None; words = ['']; link=0; more=0;  more2=0;  more3=0; doChunk=True; responseChunks=[]
+	url='https://en.wikipedia.org/wiki/Main_Page'
 	global droid, prompt, tts
 	exec('with open(storageFile) as file: list1 = file.readlines()')
 	#### MAIN LOOP:
@@ -114,7 +115,10 @@ def main(input=input, *args):
 				if input is None: time.sleep(7); print 'input is None'; input=""; exec(channel)
 				#else: print "input2=",input;
 				
-			input = input.strip('\r')	
+			input = input.strip('\r')
+				
+			try: exec(input)
+			except Exception,e: print 'err1', str(e)
 			#if input == 'set': continue
 			# if input == 'loop': response = mainLoop()
 			
@@ -182,18 +186,20 @@ def main(input=input, *args):
 			if 'search' in input:
 				try:
 					query = input.replace('search ','')
-					print "searching "+query
+					print "searching.. "+query
 					from pygoogle import pygoogle
 					g = pygoogle(query)
 					g.pages = 1
 					results = g.__search__(); 
-					choose=True; 
+					#choose=True; 
 					response = results[link]['content']; #response = repr(response)
-					response.encode('ascii', 'ignore').replace('\n','')
+					response = response.encode('ascii', 'ignore').replace('\n','')
 					url = list(results[link]['url'])[0]; print url
 					# response.encode('ascii', 'ignore'); 
+					doChunk=False
 				except Exception,e: print str(e)
 				# print str(results)
+				print response
 				
 			# print 5######## browse
 			if choose:
@@ -207,6 +213,10 @@ def main(input=input, *args):
 					try: 
 						response = " ".join(go(url))
 					except Exception,e: print str(e); input = raw_input('pause')
+			if choose:
+				print 'choose = ', choose
+				print 'choice = ', choice
+				if choice == 'cancel': choose = False
 				
 			###### actions
 			if 'e' in input:
@@ -245,90 +255,67 @@ def main(input=input, *args):
 				# for word in words:
 					# word.strip('?')
 					# if word not in dctn and 'is' not in input:  response = 'what is '+ word +"?"
+					# if word not in dctn and 'is' not in input:  response = 'what is '+ word +"?"
 				
 			
 			#print 7########################### output
 			##if response: print 'endresponse=',response
 			##else: prompt = 'anything else? (yes/no)>'
 			
-			if input == 'go': response = go(); doChunk=True
+			if input == 'go': response = go(url); doChunk=True
 			# if input == 'links': linksD=goLinks(); response = " ".join(linksD.keys()); doChunk=True; #choose = True
-			if input == 'links': linksD=goLinks(); response = linksD.keys(); doChunk=True; #choose = True
-			if choose:
-				print 'choose = ', choose
-				print 'choice = ', choice
-				if choice == 'cancel': choose = False
+			if input == 'links': linksD=goLinks(url); responseChunks = linksD.keys();response=responseChunks; doChunk=True; #choose = True
 			#if choice == 'more' or choice == 'and' or choice == 'm' or input == 'more' or input == 'm' or input == 'and': 
 			if input == 'more' or input == 'm' or input == 'and': 
-				print 0
-				
-				while True:
-					if responseChunks[more]: 
-						if len(responseChunks[more]) > 1: 
-							if responseChunks[more][more2]:
-								if len(responseChunks[more][more2]) > 1: 
-									if responseChunks[more][more2][more3]: 
-										if len(responseChunks[more][more2][more3]) > 1: 
-											response = responseChunks[more][more2][more3]
-											more3 = more3+1; 
-											#print 3,response
-											break
-								response = responseChunks[more][more2]
-								more2 = more2+1; 
-								#print 2,response
-								break
-						response = responseChunks[more]
-						more = more+1; 
-						#print 1,response
-						break
-					else: print 'no more'; response = 'no more'; break		
-				
-				# if responseChunks[more][more2][more3] and len(responseChunks[more][more2][more3]) > 1: 
-					# response = responseChunks[more][more2][more3]
-					# more3 = more3+1; 
-					# print 3,response
-			
-				# if responseChunks[more][more2] and len(responseChunks[more][more2]) > 1: 
-					# response = responseChunks[more][more2]
-					# more2 = more2+1; 
-					# print 2,response
-				
-				# if responseChunks[more] and len(responseChunks[more]) > 1: 
-				# try: 
-					# print responseChunks[more]
+				for item in responseChunks: 
+					if isinstance(item,list): nested = True
+					else: nested = False
+				if nested: 
+					l1 = [item for sublist in responseChunks for item in sublist]
+				#print 'l1',l1
+					if l1[more]: response = l1[more]
+				else: reponse = responseChunks[more]
+				# while True:
 					# if responseChunks[more]: 
-						# response = responseChunks[more]
-						# more = more+1; 
-						# print 1,response
-				#except IndexError: print 'no more'; response = 'no more'; choose = False
-				# except IndexError: print 'no more'; response = 'no more'
-				# try: 
-					# if len(responseChunks[more][more2]) > 1: 
-						# response = responseChunks[more][more2]
-						# more2 = more2+1; 
-						# print 2,response
-				# except: print 200
-				# try: 
-					# if responseChunks[more][more2][more3] and len(responseChunks[more][more2][more3]) > 1: 
-						# response = responseChunks[more][more2][more3]
-						# more3 = more3+1; 
-						# print 3,response
-				# except: print 300
+						# if len(responseChunks[more]) > 1: 
+							# if responseChunks[more][more2]:
+								# if len(responseChunks[more][more2]) > 1: 
+									# if responseChunks[more][more2][more3]: 
+										# if len(responseChunks[more][more2][more3]) > 1: 
+											# response = responseChunks[more][more2][more3]; print 1
+											# more3 = more3+1; break
+									# response = responseChunks[more][more2]; print 2
+									# more2 = more2+1; break
+						# response = responseChunks[more]; print 1
+						# more = more+1; break
+					# print 'no more'; response = 'no more'; break		
+				more = more+1
 				
 			if input == 'repeat': response=responseChunks[more]
 			if input == 'repeat last': response=responseChunks[more-1]
 			if 'link ' in input: 
 				link = input.replace('link ', '') #  list = input.split(" "); sub = [list.index("link"):list.index(",")]
 				for k,v in linksD.items():
-					if link in k:  print k,v; go(v)#; url = v
+					if link in k:  url = v
+				print url; response = go(url); doChunk=True
 			
 				
 			#print 8 ################# chunking starts with objects, lists
 			if tts and response and doChunk and len(response) > 50: 
 				print 'chunking'
-				responseChunks = chunk(response[0:20])
-				print 'rc',responseChunks #################
+				responseChunks = chunk(response)
+				print 'rc',responseChunks[0:50] #################
 				response=responseChunks[0]
+				# while True:
+					# if responseChunks[more]: 
+						# if len(responseChunks[more]) > 1: 
+							# if responseChunks[more][more2]:
+								# if len(responseChunks[more][more2]) > 1: 
+									# if responseChunks[more][more2][more3]: 
+										# if len(responseChunks[more][more2][more3]) > 1: 
+											# response = responseChunks[more][more2][more3];break
+									# response = responseChunks[more][more2];break
+							# response = responseChunks[more];break
 				# if any(isinstance(i, list) for i in response):
 					# response=responseChunks[0][more]
 				# else:
@@ -337,12 +324,12 @@ def main(input=input, *args):
 				
 			# print "endinput="+input
 			input=""
-			print response#[0:500]
+			print response[0:500]
 			if tts: 
 				print 'speaking'; 
 				exec(responseChannel) 
 			if not choose: response = ''
-			#print 9 
+			print 9 
 		except Exception,e: 
 			print 'main='+str(e)
 			input = raw_input(prompt)
@@ -431,9 +418,9 @@ def go(url='https://en.wikipedia.org/wiki/Main_Page'):#'http://www.google.com'):
 	VALID_TAGS = ['p','span','b']# ,'b','li',
 	paras = [i.text.encode('ascii',"ignore") for i in soup.find_all(VALID_TAGS)] ################## removes <p>s  .replace('-',' hyphen ')
 	paras = filter(None, paras)
-	paras = [i.replace('\n','.').replace('\r','.') for i in paras] 
+	paras = [i.replace('\n','.').replace('\r','.').replace('&quot;','"') for i in paras] 
 	# paras = [i.replace('(','parens ').replace(')',' parens').replace('[','bracket').replace(']','bracket') for i in paras] 
-	print 'p0:20', paras[0:20]
+	print 'p0:20', paras[0:20],'\n'
 	#input = raw_input('pause')
 	return paras
 
