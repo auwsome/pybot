@@ -92,7 +92,7 @@ if serverCheck==1:
 #input=""
 #print input
 def main(input=input, *args):
-	response=None; choose=False; choice=""; YorN=None; words = ['']; link=0; more=0; doChunk=True; responseChunks=[]
+	response=None; choose=False; choice=""; YorN=None; words = ['']; link=0; more=0;  more2=0;  more3=0; doChunk=True; responseChunks=[]
 	global droid, prompt, tts
 	exec('with open(storageFile) as file: list1 = file.readlines()')
 	#### MAIN LOOP:
@@ -251,19 +251,70 @@ def main(input=input, *args):
 			##if response: print 'endresponse=',response
 			##else: prompt = 'anything else? (yes/no)>'
 			
-			if input == 'go': response = " ".join(go()); doChunk=True
+			if input == 'go': response = go(); doChunk=True
 			# if input == 'links': linksD=goLinks(); response = " ".join(linksD.keys()); doChunk=True; #choose = True
-			if input == 'links': linksD=goLinks(); response = " ".join(linksD.keys()); doChunk=True; #choose = True
+			if input == 'links': linksD=goLinks(); response = linksD.keys(); doChunk=True; #choose = True
 			if choose:
 				print 'choose = ', choose
 				print 'choice = ', choice
 				if choice == 'cancel': choose = False
 			#if choice == 'more' or choice == 'and' or choice == 'm' or input == 'more' or input == 'm' or input == 'and': 
 			if input == 'more' or input == 'm' or input == 'and': 
-				more = more+1; 
-				#try: response=' '.join(responseChunks[more])
-				try: response=responseChunks[more]
-				except IndexError: print 'no more'; response = 'no more'; choose = False
+				print 0
+				
+				while True:
+					if responseChunks[more]: 
+						if len(responseChunks[more]) > 1: 
+							if responseChunks[more][more2]:
+								if len(responseChunks[more][more2]) > 1: 
+									if responseChunks[more][more2][more3]: 
+										if len(responseChunks[more][more2][more3]) > 1: 
+											response = responseChunks[more][more2][more3]
+											more3 = more3+1; 
+											#print 3,response
+											break
+								response = responseChunks[more][more2]
+								more2 = more2+1; 
+								#print 2,response
+								break
+						response = responseChunks[more]
+						more = more+1; 
+						#print 1,response
+						break
+					else: print 'no more'; response = 'no more'; break		
+				
+				# if responseChunks[more][more2][more3] and len(responseChunks[more][more2][more3]) > 1: 
+					# response = responseChunks[more][more2][more3]
+					# more3 = more3+1; 
+					# print 3,response
+			
+				# if responseChunks[more][more2] and len(responseChunks[more][more2]) > 1: 
+					# response = responseChunks[more][more2]
+					# more2 = more2+1; 
+					# print 2,response
+				
+				# if responseChunks[more] and len(responseChunks[more]) > 1: 
+				# try: 
+					# print responseChunks[more]
+					# if responseChunks[more]: 
+						# response = responseChunks[more]
+						# more = more+1; 
+						# print 1,response
+				#except IndexError: print 'no more'; response = 'no more'; choose = False
+				# except IndexError: print 'no more'; response = 'no more'
+				# try: 
+					# if len(responseChunks[more][more2]) > 1: 
+						# response = responseChunks[more][more2]
+						# more2 = more2+1; 
+						# print 2,response
+				# except: print 200
+				# try: 
+					# if responseChunks[more][more2][more3] and len(responseChunks[more][more2][more3]) > 1: 
+						# response = responseChunks[more][more2][more3]
+						# more3 = more3+1; 
+						# print 3,response
+				# except: print 300
+				
 			if input == 'repeat': response=responseChunks[more]
 			if input == 'repeat last': response=responseChunks[more-1]
 			if 'link ' in input: 
@@ -275,12 +326,13 @@ def main(input=input, *args):
 			#print 8 ################# chunking starts with objects, lists
 			if tts and response and doChunk and len(response) > 50: 
 				print 'chunking'
-				# if type(response) == 'object':
-					# responseChunks = chunk(response)
-				# if type(response) == 'list':
-				responseChunks = chunk(response)
-				#print 'rc',responseChunks #################
+				responseChunks = chunk(response[0:20])
+				print 'rc',responseChunks #################
 				response=responseChunks[0]
+				# if any(isinstance(i, list) for i in response):
+					# response=responseChunks[0][more]
+				# else:
+					# response=responseChunks[0]
 				doChunk=False
 				
 			# print "endinput="+input
@@ -300,69 +352,72 @@ def main(input=input, *args):
 	sys.exit()	   
 
 def chunk(response=''):
-	span = 16; response2=[]
-	#### splits on .
-	if if type(response) == 'object':
-		responseSentences = response.replace('No.','number').replace('.','.!@#').split('!@#')
-		for responsePhrases in responseSentences:
-			print responsePhrases
+	#### takes list, returns list
+	span = 16; chunked=[]
+	#print 1,response
+	#### splitypets on .
+	#if isinstance(response, str):
+	for index,sentences in enumerate(response):
+		#responseSentences = response.replace('No.','number').replace('.','.!@#').split('!@#')
+		#print repr(sentences)
+		#split = sentences.split(".")
+		response[index] = sentences.replace('No.','number').replace('. ','. !@#').split('!@#')
+		#print response[index]
+		#time.sleep(1)
+		for phrases in chunked:
 			#### splits on , 
-			phrases = responsePhrases.replace(',',',!@#').split('!@#'); #print phrases
+			phrases = phrases.replace(',',',!@#').split('!@#'); #print phrases
 			#### splits large clauses
-			for index,item in enumerate(phrases):
-				phraseWords = item.split(" ")
-				responseChunks = splitChunk(phraseWords)
-		#### and then joins small strings
-		for i in responseChunks:
-			if len(i) < span:
-				small = item
+			for clause in phrases:
+				clauseWords = clause.split(" ")
+				clause = splitChunks(clauseWords, span)
+			print phrases
+	#print 'rb',response
+	#### and then joins small clauses
+	for index,fragment in enumerate(response):
+		for index,clause in enumerate(fragment):
+			if len(clause) < span:
+				small = clause
 				try:
-				#exec('try:\n\t
 					smallR = phrases[index+1]
-					#\nexcept:pass')# Exception,e: print str(e)')
 					if smallR is not None and len(smallR.split(" ")) < span and len(small.split(" "))+len(smallR.split(" ")) < span:
 							#print smallR
 						joined = ' '.join([small, smallR])
 						phrases[index] = joined
 						phrases.remove(smallR)
-						# exec('try:\n\tjoined = ' '.join([small, smallR])\nexcept:pass')
-						#joined = ' '.join([small, smallR]); #print "j",joined
-				except Exception,e: print '4'+str(e)
-						# exec('try:\n\tjoined = ' '.join([small, smallR])\nexcept:pass')
-						# phrases[index] = joined
-						# exec('try:\n\tphrases.remove(smallR)\nexcept:pass')
-						# print 'joined',phrases
-				#smallest = phrases[phrases.index(min(phrases, key=len))]; #print "s",smallest,"ls",len(smallest)
-				#while len(smallest.split(" ")) < span:
-					# exec('try:\n\tsmallestR = phrases[phrases.index(min(phrases, key=len))+1]\nexcept Exception,e: print str(e)'); print "sr",smallestR, "lsr",len(smallestR)
-					# exec('try:\n\tsmallestL = phrases[phrases.index(min(phrases, key=len))-1]\nexcept: pass') #print "sr",smallestR, "lsr",len(smallestR)
-					# if len(smallest.split(" ")) < span and len(smallestR.split(" ")) < span and len(smallest.split(" "))+len(smallestR.split(" ")) < span:
-						# item = ' '.join([smallest, smallestR]); #print "i2",item
-						# phrases[phrases.index(min(phrases, key=len))] = item
-						# phrases.remove(smallestR)
-		#print responsePhrases
-		response2.append(responsePhrases); 
-	#print response2
-	return response2
-		#largest = phrases[phrases.index(max(phrases, key=len))]; #print largest
-		# for phrase in responsePhrases:
-			# print 1, phrase
-			#phraseWords = phrases.split(' ')
+				except Exception,e: pass#print '4'+str(e)
+			#print responseSentences
+					
+	#print 'r2',response
+	#### returns list
+	return response
 			
-			
-	elif type(response) == 'list': 
-		responseChunks = splitChunk(response)
-			
-def splitChunk(chunkList):
-#### splits large clauses
-	i=0; chunk=[]; responseChunks=[]
+def splitChunks(chunkList, span=16):
+	#### checks and splits large clauses
+	i=0; chunk=[]; chunks=[]
 	if len(chunkList) > span:
 		for word in chunkList:
 			if i < span: chunk.append(word); i=i+1; 
-			if i == span: responseChunks.append(" ".join(chunk)); i=0; chunk=[]
-		responseChunks.append(" ".join(chunk)) # append last one
-	return responseChunks
+			if i == span: chunks.append(" ".join(chunk)); i=0; chunk=[]
+		chunks.append(" ".join(chunk)) # append last one
+	return chunks
 
+def combineChunks(chunkList, span=16):
+	#### checks and joins small clauses
+	for i in splitClauses:
+		if len(i) < span:
+			small = clause
+			try:
+				smallR = phrases[index+1]
+				if smallR is not None and len(smallR.split(" ")) < span and len(small.split(" "))+len(smallR.split(" ")) < span:
+						#print smallR
+					joined = ' '.join([small, smallR])
+					phrases[index] = joined
+					phrases.remove(smallR)
+			except Exception,e: print '4'+str(e)
+	combinedClauses = splitClauses	
+	return combinedClauses
+	
 def go(url='https://en.wikipedia.org/wiki/Main_Page'):#'http://www.google.com'):
 	print 'going to.. ',url
 	br = mechanize.Browser()
@@ -378,7 +433,7 @@ def go(url='https://en.wikipedia.org/wiki/Main_Page'):#'http://www.google.com'):
 	paras = filter(None, paras)
 	paras = [i.replace('\n','.').replace('\r','.') for i in paras] 
 	# paras = [i.replace('(','parens ').replace(')',' parens').replace('[','bracket').replace(']','bracket') for i in paras] 
-	print paras[0:20]
+	print 'p0:20', paras[0:20]
 	#input = raw_input('pause')
 	return paras
 
