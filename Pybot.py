@@ -62,7 +62,8 @@ if 'arm' in sys.platform:# == 'linux-armv71':
 	dictName = '/storage/sdcard1/dict.json'
 	cmdsName = '/storage/sdcard1/commands.json'
 	import android 
-	from BeautifulSoup import BeautifulSoup
+	#from BeautifulSoup import BeautifulSoup
+	from bs4 import BeautifulSoup
 	droid = android.Android(); d = droid
 	tts = True
 	#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
