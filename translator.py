@@ -13,32 +13,33 @@ from textblob import TextBlob
 blob = TextBlob("write 'hello, how are you?' into a file")
 blob.tags
 
-verbsString = 'write make create '; verbs = verbString.split(" ")
-prepositionsString = 'into over'; prepositions = prepositionsString.split(" ")
+verbsString = 'write ,make ,create '; verbs = verbsString.split(","); print verbs
+prepositionsString = 'in ,into ,over '; prepositions = prepositionsString.split(",")
 
 
 
 with open("pseudocode.txt", 'rb') as file: 
-	list1 = file.readlines(file)
+	list1 = file.readlines()
 
 def main():
 	for line in list1:
+		line = line.strip("\n").strip("\r").strip("\t").split(" "); print line
 		# remove determinants or just don't use them
 		for verb in verbs:
-			if verb in line:
+			print verb, line
+			#if verb in line:
+			if 'write' in line:
 				#sentence structure SVO
+				#SO = line.split(verb); subject = SO[0]; object1 = SO[1]
 				SO = line.split(verb); subject = SO[0]; object1 = SO[1]
 				if verb == 'write': 
 					for preposition in prepositions:
+						print preposition
 						if preposition in line:
 							PO = line.split(preposition); object2 = PO[1]
-							if preposition == 'in':
-								write(object1, file=object2)
-							if preposition == 'into':
-								write(object1, into=True, file=object2)
-							if preposition == 'over':
-								write(object1, into=True, file=object2, over=True)
+							write(object1, preposition, object2)
 						else: write(object1)
+			else: print line
 
 '''
 	blob = TextBlob(line)
@@ -64,22 +65,28 @@ def main():
 			# line = line.replace('write','print')
 			# if 'write into' in line:
 			# elif print in line: list2 = list(line); list2[1] = "'"+list[1]; list2[-1] = list2[-1]+"'"; line = " ".join(list2)
-		else print line
 
-def write(sequence, into=False, file=False):
-	if into: 
-		if file == 'file': fileMode = 'wb'
-		if into: fileMode = 'ab'
-		if over: fileMode = 'wb'
-		if isinstance(sequence,lst):
-			with open(File, fileMode) as file: file.writelines(sequence)
+def write(sequence, preposition=False, object2=False):
+	if object2:
+		# check for filename
+		if 'file named' in object2:
+			fileName = addQuotes(sliceAt(object2,'file named '))
+	if preposition: 
+		if preposition == 'in': fileMode = 'wb'
+		if preposition == 'into': fileMode = 'ab'
+		if preposition == 'over': fileMode = 'wb'
+		if isinstance(sequence,list):
+			with open(fileName, fileMode) as file: file.writelines(sequence)
 		if isinstance(sequence,str):
-			with open(File, fileMode) as file: file.write(sequence)
+			with open(fileName, fileMode) as file: file.write(sequence)
 	else: print sequence	
 
-
+def addQuotes(string):
+	return "'"+string+"'"
+def sliceAt(string, slicePoint):
+	return string[string.index(slicePoint)+len(slicePoint):]
 	
 # check __main__ to run functions now that defined in any order above
 if __name__=="__main__":
-	readFiles()
 	main()
+	input = raw_input("")
