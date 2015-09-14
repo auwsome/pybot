@@ -5,7 +5,7 @@ from textblob import TextBlob
 blob = TextBlob("write 'hello, how are you?' into a file")
 blob.tags
 
-global functionD; verbsString = 'write,make,create'; verbs = verbsString.split(","); #print verbs
+global functionD; verbsString = 'write,make,create'; global verbs; verbs = verbsString.split(","); #print verbs
 prepositionsString = 'in into over '; prepositions = prepositionsString.split(" ")
 
 def getInstructions(): with open("pseudocode.py", 'rb') as file: return = file.readlines()
@@ -64,8 +64,9 @@ def think(line):
 		
 	## check for verbs (should be only one per imperative clause)
 	for verb in noodle.keys():
-		if verb.lstrip("to ").strip(" something") in line:
-			function = noodle[verb]; something = something; evaluate(function)
+		verb = verb.lstrip("to ").strip(" something")
+		if verb in line:
+			instructions = noodle[verb]; params = [:line.index(verb)+1]; evaluate(instructions, params)
 		
 	if lineList[0] in verbs:
 		## sentence structure SVO
@@ -84,7 +85,11 @@ def think(line):
 			something = lineList[1:]
 
 #def learn(instruction):
-def evaluate():
+def evaluate(instructions):
+	instructionsL = instructions.split(", ")
+	for instruction in instructionsL:
+		for verb in verbs:
+			if verb
 	
 	
 def remember(noodle):
@@ -117,6 +122,7 @@ def write(sequence, preposition=False, object2=False):
 def addQuotes(string): return "'"+string+"'"
 def sliceAt(string, slicePoint): return string[string.index(slicePoint)+len(slicePoint):]
 def joins(list): return " ".join(list)
+def splits(string): return string.split(" ")
 	
 # check __main__ to run functions now that defined in any order above
 if __name__=="__main__":

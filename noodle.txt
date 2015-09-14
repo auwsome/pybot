@@ -1,6 +1,7 @@
 
-to dictionary, write dictionary
+to write, 
 
+to dictionary, write dictionary
 
 to say something, write something and if tts is true then speak something
 to exit, sys.exit()
