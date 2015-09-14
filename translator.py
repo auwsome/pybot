@@ -1,76 +1,96 @@
 import translated
 import nltk, re
-#nltk.download('punkt')
-#nltk.download('maxent_treebank_pos_tagger')
-#pypm install numpy
-#tagdict = load('help/tagsets/upenn_tagset.pickle'); tagdict.keys()
-#http://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
-#text = nltk.word_tokenize("They refuse to permit us to obtain the refuse permit")
-#nltk.pos_tag(text)
-# re.findAll('(.*) computer(.*)')
 
 from textblob import TextBlob
 blob = TextBlob("write 'hello, how are you?' into a file")
 blob.tags
 
-verbsString = 'write ,make ,create '; verbs = verbsString.split(","); print verbs
-prepositionsString = 'in ,into ,over '; prepositions = prepositionsString.split(",")
+verbsString = 'write make create'; verbs = verbsString.split(" "); #print verbs
+prepositionsString = 'in into over '; prepositions = prepositionsString.split(" ")
 
+def getInstructions(): with open("pseudocode.py", 'rb') as file: return = file.readlines()
+def remindNoodle(): with open("noodle.txt", 'rb') as file: return = file.readlines()
+def dictionaryNoodle(noodle): 
+	global functionD
+	for line in noodle:
+		if line.startswith("to"):
+			verb = " ".join(line[0:lineList.index(',')-1]); verbs.append(verb)
+			functionS = lineList[lineList.index(','):]; functionL = functionS.split(", "); functionD[verbDef] = functionL
+			return functionD
+def getInput(): exec('print 1')
 
+def main():	
+	## remind verb/function definitions
+	noodle = remindNoodle()
+	global noodleD; noodleD = dictionaryNoodle(noodle)
+			
+	## learn instructions
+	for line in getInstructions():
+		print line #'lineList>',lineList
+		lineList = formatLine(line); if lineList == '': break
+		think(lineList)		
+		
+	## do input
+	# for line in getInput():
+		# print line #'lineList>',lineList
+		# lineList = formatLine(line); if lineList == '': break
+		# think(lineList)		
+		
+def formatLine(line):
+	## parse line
+	if line.startswith("#"): break ## ignore comments
+	line = line.strip("\n").strip("\r").strip("\t"); print line ## clean up line
+	#line = line.strip("\n").strip("\r"); print line ## clean up line, leave tabs
+	## find strings
+	strings = re.findall(r"\'(.+?)\'",line); #print strings 
+	for index,string in enumerate(strings): ## replace strings with list items
+		line = line.replace(line[line.index(string)-1:line.index(string)+len(string)+1], strings[index]) #print 2,strings[index]
+	lineList = line.split(" "); return LineList #print lineList ## split into list
 
-with open("pseudocode.txt", 'rb') as file: 
-	list1 = file.readlines()
-
-def main():
-	for line in list1:
-		line = line.strip("\n").strip("\r").strip("\t").split(" "); print line
-		# remove determinants or just don't use them
-		for verb in verbs:
-			print verb, line
-			#if verb in line:
-			if 'write' in line:
-				#sentence structure SVO
-				#SO = line.split(verb); subject = SO[0]; object1 = SO[1]
-				SO = line.split(verb); subject = SO[0]; object1 = SO[1]
-				if verb == 'write': 
-					for preposition in prepositions:
-						print preposition
-						if preposition in line:
-							PO = line.split(preposition); object2 = PO[1]
-							write(object1, preposition, object2)
-						else: write(object1)
-			else: print line
-
-'''
-	blob = TextBlob(line)
-	tagged = nltk.pos_tag(line); print tagged
-	#verbs = [a[1] for (a, b) in tagged if b[1] == 'VB']
-	verbs = [a for (a, b) in tagged if b == 'VB']
-	prepositions = [a for (a, b) in tagged if b == 'IN']
-	prepositions = [a for (a, b) in tagged if b == 'IN']
-	if verbs: 
-		#print verb
-		for verb in verbs:
-			if verb == 'write':
+def think(lineList=lineList):
+		## set variables
+		if ' = ' in line: var = line[:line.index(' = ')]; assignment = line[line.index(' = ')+3:]; global var; var = assignment;
+		if ' is ' in line: var = line[:line.index(' is ')]; assignment = line[line.index(' is ')+3:]; global var; var = assignment; #print var,1,assignment;
+			
+		## order of operations
+		## check for conditionals and store them
+		if "if" in lineList: 
+			if lineList[0] == "if":
+				if lineList[1] == "I":
+					if lineList[2] == "say":
+						command = lineList[2:lineList.index(',')]
+						instructionWhole = lineList[lineList.index(',')+1:]
+						if instructionWhole[0] = 'then': instructionWhole = instructionWhole.remove("then")
+						noodleD[command] = instructionWhole
+		## start with verbs
+		#for verb in verbs:
+			#if verb in lineList:
+		if lineList[0] in verbs:
+			## sentence structure SVO
+			#verbIndex = lineList.index(verb); subject = lineList[:verbIndex]; # print subject ## find if subject
+			if strings: object1 = [strings[0]]
+			else: object1 = lineList[verbIndex+1:] #print subject,object1
+			if verb == 'write': 
 				for preposition in prepositions:
-					if preposition == 'into':
-						
-			else: 
-				prompt = "how do i ",verb; exec(channel) 
-				#input = 
-'''				
-				
-		# if 'into a file' in line:
-		# if 'write' in line:
-			# line = line.replace('write','print')
-			# if 'write into' in line:
-			# elif print in line: list2 = list(line); list2[1] = "'"+list[1]; list2[-1] = list2[-1]+"'"; line = " ".join(list2)
-
+					if preposition in lineList:
+						#print 3,preposition
+						prepositionIndex = lineList.index(preposition)
+						object2 = lineList[prepositionIndex+1:]; print object2
+						write(object1, preposition, " ".join(object2)); break
+				write(" ".join(object1)); break
+			if lineList[0] in functionD.keys():
+				something = lineList[1:]
+	
+	
 def write(sequence, preposition=False, object2=False):
+	fileName=''
+	globals().update(locals())
 	if object2:
 		# check for filename
 		if 'file named' in object2:
-			fileName = addQuotes(sliceAt(object2,'file named '))
+			fileName = sliceAt(object2,'file named '); print fileName
+		if fileName: pass
+		else: fileName = 'temp.txt'
 	if preposition: 
 		if preposition == 'in': fileMode = 'wb'
 		if preposition == 'into': fileMode = 'ab'
@@ -79,12 +99,18 @@ def write(sequence, preposition=False, object2=False):
 			with open(fileName, fileMode) as file: file.writelines(sequence)
 		if isinstance(sequence,str):
 			with open(fileName, fileMode) as file: file.write(sequence)
-	else: print sequence	
+	else: print sequence #'sequence>',sequence	
 
 def addQuotes(string):
 	return "'"+string+"'"
 def sliceAt(string, slicePoint):
 	return string[string.index(slicePoint)+len(slicePoint):]
+	
+def remember(noodle):
+	if functionD != noodleD:
+		for key,value in functionD.items():
+			for line in getNoodle():
+				if 
 	
 # check __main__ to run functions now that defined in any order above
 if __name__=="__main__":
