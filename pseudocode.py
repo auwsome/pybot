@@ -1,6 +1,6 @@
 # named as python file for editor functionality, commenting, etc.
 
-write hello
+#write hello
 write 'hello'
 say 'hello'
 write 'hello' into file

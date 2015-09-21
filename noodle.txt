@@ -1,5 +1,5 @@
 
-to write, 
+to write something, print something 
 
 to dictionary, write dictionary
 
