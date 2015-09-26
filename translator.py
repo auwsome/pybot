@@ -1,9 +1,21 @@
 #import translated
-import nltk, re
+import nltk, re, json
+#from pyDatalog import pyDatalog
 
 from textblob import TextBlob
 blob = TextBlob("write 'hello, how are you?' into a file")
 blob.tags
+
+isS = '''{
+write :[  (v,print), (v,scrawl)  ],
+}'''
+# isD = {
+# 'write' :[  ('v','print'), ('v','scrawl')  ],
+# }
+isSD = re.sub("(\w+)", "'"+"\\1"+"'", isS); #print isSD
+global isD; isD = eval (isSD); #print isD
+#global isD; isD = dict(isSD)
+print 'isD: ',isD #,isD['write'][0][0]
 
 global verbsL; verbsString = 'write,make,create'; verbsL = verbsString.split(","); #print verbs
 global prepositions; prepositionsString = 'in ,into ,over '; prepositions = prepositionsString.split(",")
@@ -12,55 +24,100 @@ global functionD; functionD = {};
 def getFile(file): f = open(file,"rb"); return f.readlines(); f.close()
 def getInstructions(): return getFile("pseudocode.py")
 def remindNoodle(): return getFile("noodle.txt")
+#def remindNoodleJ(): return json.loads("noodle2.py")
 def dictionaryNoodle(noodle): 
 	for line in noodle: 
 		if line.startswith("to"): verbDef = line[:line.index(",")]; functionString = line[line.index(",")+1:]; functionD[verbDef] = functionString
 	return functionD
 def getInput(): exec('print 1')
 #return 1 if n <= 1 else n*f(f,n-1)
+# if sys.platform = '': is[write] = (v,)
 
 def main():	
 	## remind verb/function definitions
 	noodle = remindNoodle()
-	global verbD; verbD = dictionaryNoodle(noodle)
-	print verbD
+	global verbD; verbD = dictionaryNoodle(noodle); #print verbD
+	#global isD; #isD = remindNoodleJ(); 
 			
-	## learn instructions
+	## do and learn from instructions
 	input = getInstructions(); #print input
 	## do input
 	
 	for index,line in enumerate(input):
 		line = formatLine(line); 
-		print 'line: ',line
+		#if line: print 'line: ',line
 		if line == '' or line == None: continue; 
+		#if line: continue; 
+		print 'line: ',line
 		## check for contractions and split imperative clauses
 		# if 'and' or 'then' in line:	
 			# lineSplit = line.split("and").split("then")
 			# line[line.index()]
 			# for line in lineSplit:
 		#lineList = line.split(" ",",")## split into list
-		lineList = re.split('(\W+)', line); print lineList
-		## order of operations
-		## check for conditionals and learn them
-		if "if" in line: 
-			print line
-			conditionalL = lineList[lineList.index('if'):lineList.index(', ')-1]
-			conditionL = conditionalL.remove("if"); 
-			if conditionList[0] == "I":
+		line = line.lower()
+		lineList = re.split('(\W+)', line); #print lineList ##########
+		lineList = [i for i in lineList if i != " "]
+		############################################# order of operations 
+		kw = lineList[0] # imperative, conditional or query must be indicated by first word
+		############ check for variable definition
+		## set variables
+		# if ' = ' in line: var = line[:line.index(' = ')]; assignment = line[line.index(' = ')+3:]; var = assignment;
+		# if ' is ' in line: var = line[:line.index(' is ')]; assignment = line[line.index(' is ')+3:]; var = assignment; #print var,1,assignment;
+		if 'is' in lineList: var = joins(lineList[:lineList.index('is')]); assignment = joins(lineList[lineList.index('is')+1:]); print var,"is",assignment ;var = assignment; continue## print before assignment
+		if '=' in lineList: var = joins(lineList[:lineList.index('=')]); assignment = joins(lineList[lineList.index('=')+1:]); print var,"is",assignment; var = assignment; continue
+		
+		############ check for conditionals
+		#if "if" in line: 
+		#if "but only if" in line: 
+		if kw == "if": 
+			#print line
+			#conditionalList = lineList[lineList.index('if'):lineList.index(', ')-1]; print conditionalList
+			#if verb in conditionalList:
+				
+			if lineList[lineList.index('if')+1] == "I":
+			#conditionList = conditionalList.remove("if"); print conditionList
+			#if conditionList[0] == "I":
 				if conditionList[1] == "say":
 					command = joins(lineList[2:lineList.index(', ')-1])
 					instructionWhole = line[line.index(',')+1:]
 					if 'then' in instructionWhole: instructionWhole = instructionWhole.lstrip("then ")
 					verbD[command] = instructionWhole
-		think(line)	
-		
+		############ check for verb definitions or instructions
+		elif kw == "to": 
+			evaluate(lineList)
+		############ check for query
+		elif kw == "what":
+			pass
+					
+		else: 
+		############ compute imperative
+			#print 1,isD.keys(),2,kw #######
+			if kw in isD.keys():
+				#print 'in keys',isD[kw][0][1] ##########
+				if isD[kw][0][0] == 'v':
+					## sentence structure SVO
+					verb = kw; #print 'verb: ',verb; #############
+					verbIndex = lineList.index(verb); #subject = lineList[:verbIndex]; # print subject ## find if subject
+					if strings: object1 = 'strings[0]'; #print 'o',object1 #############
+					else: object1 = lineList[verbIndex+1:] #print subject,object1
+					input = 'y'#raw_input("try: "+isD[kw][0][1]+" "+object1+"?")
+					if input == 'y':
+						try: 
+							exec(isD[kw][0][1]+" "+object1)
+						except: print 'error exec verb'
+			else: print "I don't know how to "+kw	
+			#exit()
+	
+	input = 'n'#raw_input("save?")
+	if input == 'n': exit()
 	## store noodle	
 	remember(noodle)
 		
 def formatLine(line):
 	## parse line
 	if line.startswith("#"): return ## ignore comments
-	line = line.strip("\n").strip("\r").strip("\t"); print line ## clean up line
+	line = line.strip("\n").strip("\r").strip("\t"); # print line ## clean up line
 	#line = line.strip("\n").strip("\r"); print line ## clean up line, leave tabs
 	## find strings
 	global strings; strings = re.findall(r"\'(.+?)\'",line); #print strings 
@@ -68,13 +125,28 @@ def formatLine(line):
 		line = line.replace(line[line.index(string)-1:line.index(string)+len(string)+1], strings[index]) #print 2,strings[index]
 	return line 
 
-def think(line):
-	lineList = line.split(" "); 
-	## set variables
-	global var
-	if ' = ' in line: var = line[:line.index(' = ')]; assignment = line[line.index(' = ')+3:]; var = assignment;
-	if ' is ' in line: var = line[:line.index(' is ')]; assignment = line[line.index(' is ')+3:]; var = assignment; #print var,1,assignment;
-	
+def imperative(lineList):
+	#lineList = line.split(" "); 
+	#lineList = re.split('(\W+)', line); #print lineList
+	kw = lineList[0]
+	'''
+	#print 1,isD.keys(),2,kw #######
+	if kw in isD.keys():
+		#print 'in keys',isD[kw][0][1] ##########
+		if isD[kw][0][0] == 'v':
+			## sentence structure SVO
+			verb = kw; #print 'verb: ',verb; #############
+			verbIndex = lineList.index(verb); #subject = lineList[:verbIndex]; # print subject ## find if subject
+			if strings: object1 = 'strings[0]'; #print 'o',object1 #############
+			else: object1 = lineList[verbIndex+1:] #print subject,object1
+			input = raw_input("try: "+isD[kw][0][1]+" "+object1+"?")
+			if input == 'y':
+				try: 
+					exec(isD[kw][0][1]+" "+object1)
+				except: print 'error exec verb'
+	else: print "I don't know how to "+kw
+	'''
+	'''
 	if lineList[0] in verbD.keys():
 	## check for verbs (should be only one per imperative clause)
 	#for verb in verbD.keys():
@@ -98,10 +170,11 @@ def think(line):
 			write(" ".join(object1))
 		if lineList[0] in functionD.keys():
 			something = lineList[1:]
+			'''
 
 #def learn(instruction):
-def evaluate(instructions):
-	instructionsL = instructions.split(", ")
+def evaluate(instructionsL):
+	#instructionsL = instructions.split(", ")
 	for instruction in instructionsL:
 		for verb in verbsL:
 			if verb in instructionsL: verb1 = verb
