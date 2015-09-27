@@ -3,7 +3,11 @@
 #write hello
 write 'hello'
 tts is false
-to say something, write something and if tts is true then speak something
+
+#to shout something, write something+"!"
+shout 'hello'
+to say something, if tts is False write something, if tts is True then speak something
+
 say 'hello'
 write 'hello' into file
 write 'hello' in file named test.txt

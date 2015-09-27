@@ -6,15 +6,25 @@ from textblob import TextBlob
 blob = TextBlob("write 'hello, how are you?' into a file")
 blob.tags
 
-isS = '''{
-write :[  (v,print), (v,scrawl)  ],
-}'''
+# isS = '''{
+# write: { verb: [print, scrawl]  },
+# shout: [(v,[[object1 = object1+"!"],[write]])],
+# }'''
 # isD = {
 # 'write' :[  ('v','print'), ('v','scrawl')  ],
 # }
+isS = '''{
+write: { verb: [[[print]], scrawl]  },
+shout: { verb: [[[object1 +'='+ object1+"!"],[write]], yell]},
+}'''
+isD = {
+'write': { 'verb': [[['print something']], 'scrawl']  },
+'shout': { 'verb': [[['object1 = object1'],['write something']], 'yell']},
+}
 isSD = re.sub("(\w+)", "'"+"\\1"+"'", isS); #print isSD
-global isD; isD = eval (isSD); #print isD
+global isD; #isD = eval (isSD); #print isD
 #global isD; isD = dict(isSD)
+# a.setdefault("somekey",[]).append("bob")
 print 'isD: ',isD #,isD['write'][0][0]
 
 global verbsL; verbsString = 'write,make,create'; verbsL = verbsString.split(","); #print verbs
@@ -59,7 +69,7 @@ def main():
 		lineList = re.split('(\W+)', line); #print lineList ##########
 		lineList = [i for i in lineList if i != " "]
 		############################################# order of operations 
-		kw = lineList[0] # imperative, conditional or query must be indicated by first word
+		kw = lineList[0] ### imperative, conditional or query must be indicated by first word
 		############ check for variable definition
 		## set variables
 		# if ' = ' in line: var = line[:line.index(' = ')]; assignment = line[line.index(' = ')+3:]; var = assignment;
@@ -85,34 +95,91 @@ def main():
 					verbD[command] = instructionWhole
 		############ check for verb definitions or instructions
 		elif kw == "to": 
-			evaluate(lineList)
+			verbL = lineList[lineList.index("to"):lineList.index(",")]; #print verb; #print verbD[verb]
+			if 'something' in verbL: needsParams = True; verb = verbL.remove('something')
+			verbDefinition = [lineList[lineList.index(",")+1:]]
+			
+			verbDefinitions = [[]]
+			[verbDefinitions.append([i]) if i == "," else verbDefinitions[-1].append(i) for i in verbDefinition]
+			if isD[verb] is not None: 
+				input = raw_input('do you want to add this verb?')
+			if isD[verb] is None or input == 'y':
+				isD[verb] = verbDefinitions
+			
+			'''else: 
+			lineList[lineList.index(",")+1:]
+			#`for count in verbDefinition.count(","):
+			verbDefinition
+			#def addVerbDefintion(verb, verbDefinition):
+				verbDefinition[0] = verb2
+				if isD[verb2][0][0] == 'v': continue
+				else: print "I don't know how to: "+verb2 
+					verbDefined = verbDefinition[0]
+				print eval(verbDefined)
+				
+				isD[verb] = verbDefined
+			addVerbDefintion(verbDefinition)
+			
+			if verb in line: 
+				instructions = verbD[verb]; params = line[:line.index(verb)+1];
+				evaluate(instructions, params)
+			
+			evaluate(lineList)'''
 		############ check for query
 		elif kw == "what":
 			pass
 					
 		else: 
 		############ compute imperative
-			#print 1,isD.keys(),2,kw #######
-			if kw in isD.keys():
-				#print 'in keys',isD[kw][0][1] ##########
-				if isD[kw][0][0] == 'v':
-					## sentence structure SVO
-					verb = kw; #print 'verb: ',verb; #############
-					verbIndex = lineList.index(verb); #subject = lineList[:verbIndex]; # print subject ## find if subject
-					if strings: object1 = 'strings[0]'; #print 'o',object1 #############
-					else: object1 = lineList[verbIndex+1:] #print subject,object1
-					input = 'y'#raw_input("try: "+isD[kw][0][1]+" "+object1+"?")
-					if input == 'y':
-						try: 
-							exec(isD[kw][0][1]+" "+object1)
-						except: print 'error exec verb'
-			else: print "I don't know how to "+kw	
+			def computeImperative():
+				#print 1,isD.keys(),2,kw #######
+				if kw in isD.keys():
+					#print 'in keys',isD[kw][0][1] ##########
+					if isD[kw]['verb'][0] is not None:
+						## sentence structure SVO
+						verb = kw; #print 'verb: ',verb, type(isD[kw]['verb'][0][0]); #############
+						verbIndex = lineList.index(verb); #subject = lineList[:verbIndex]; # print subject ## find if subject
+						if strings: object1 = 'strings[0]'; #print 'o',object1 #############
+						else: object1 = lineList[verbIndex+1:];  #print subject,object1
+						print 'obj:',object1
+						if type(isD[kw]['verb'][0][0]) is list: verbIsExecutable = True
+						else: print 'verb is not executable'
+						if verbIsExecutable:
+							input = 'y'#raw_input("try: "+isD[kw][0][1]+" "+object1+"?")
+							if input == 'y':
+							
+								# def execVerb(verb):	
+									# print object1 in globals(), locals()
+									# try: 
+										# object1 = object1+"!"; print object1
+										# exec(verb+" "+object1) in globals(), locals() ################################### not secure
+									# except Exception,e: print 'error exec verb: '+str(e)
+								#def execVerb(verb):	exec(verb+" "+object1)				
+								#exec("def execVerb(verb):\n\t try:\n\t\t exec(verb+" "+object1)\n\t\t except: print 'error exec verb'")
+								
+								if type(isD[kw]['verb'][0][0]) is list:								
+								#if isD[kw]['verb'][0][0][0] is not None:		
+									#for x,i in enumerate(isD[kw]['verb'][0][0]): execVerb(isD[kw]['verb'][0][0][x])
+									for x,i in enumerate(isD[kw]['verb'][0][0]): 
+										print x,i
+										try: 
+											#object1 = object1+"!"; 
+											print verb+" "+object1
+											exec(verb+" "+object1) in globals(), locals() ################################### not secure
+										except Exception,e: print 'error exec verb: '+str(e)
+										#execVerb(isD[kw]['verb'][0][0][x]); #print 'multiple definition verb'	
+								# elif type(isD[kw]['verb'][0][0]) is list:	
+									# execVerb(isD[kw]['verb'][0][0]); print 'single definition verb', isD[kw]['verb'][0][0]
+					else: print "I don't know how to.. "+kw
+				else: print "I don't know what.. "+kw+" ..is"
+			computeImperative()
 			#exit()
 	
+	print 'noodle: ',noodle
 	input = 'n'#raw_input("save?")
 	if input == 'n': exit()
 	## store noodle	
-	remember(noodle)
+	append(noodle)
 		
 def formatLine(line):
 	## parse line
@@ -159,18 +226,18 @@ def imperative(lineList):
 		verb = lineList[0]; print 'verbL: ',verb;
 		verbIndex = lineList.index(verb); #subject = lineList[:verbIndex]; # print subject ## find if subject
 		if strings: object1 = [strings[0]]
-		else: object1 = lineList[verbIndex+1:] #print subject,object1
-		if verb == 'write': 
-			for preposition in prepositions:
-				if preposition in lineList:
-					#print 3,preposition
-					prepositionIndex = lineList.index(preposition)
-					object2 = lineList[prepositionIndex+1:]; print object2
-					write(object1, preposition, " ".join(object2)); break
-			write(" ".join(object1))
-		if lineList[0] in functionD.keys():
-			something = lineList[1:]
-			'''
+		else: object1 = lineList[verbIndex+1:] #print subject,object1'''
+		# if verb == 'write': 
+			# for preposition in prepositions:
+				# if preposition in lineList:
+					##print 3,preposition
+					# prepositionIndex = lineList.index(preposition)
+					# object2 = lineList[prepositionIndex+1:]; print object2
+					# write(object1, preposition, " ".join(object2)); break
+			# write(" ".join(object1))
+		# if lineList[0] in functionD.keys():
+			# something = lineList[1:]
+			
 
 #def learn(instruction):
 def evaluate(instructionsL):
@@ -187,7 +254,7 @@ def evaluate(instructionsL):
 		# look up verb function, if includes another verb, look that up - recursive
 	
 	
-def remember(noodle):
+def append(noodle):
 	if functionD != verbD:
 		for key,value in functionD.items():
 			if functionD[key] not in verbD.keys():
