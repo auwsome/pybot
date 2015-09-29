@@ -1,4 +1,6 @@
 
+noodleD = {'noodle0':
+'''
 to write something, print something 
 
 to dictionary, write dictionary
@@ -11,3 +13,4 @@ to google something, url is "www.google.com", open url..
 
 
 to quit, exit
+''',

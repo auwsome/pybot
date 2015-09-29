@@ -40,3 +40,15 @@ shout 'hello'
 # search cheese
 
 
+to write something, print something 
+
+to dictionary, write dictionary
+
+to say something, write something and if tts is true then speak something
+to exit, sys.exit()
+
+to search something, google something, say result
+to google something, url is "www.google.com", open url..
+
+
+to quit, exit
