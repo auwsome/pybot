@@ -7,7 +7,7 @@ isD starting definition
 '''
 ## imports
 #import translated
-import nltk, re, json, operator
+import nltk, re, json, operator, string
 #from pyDatalog import pyDatalog
 
 from textblob import TextBlob
@@ -27,17 +27,14 @@ shout: { verb: [[[object1 +'='+ object1+"!"],[write]], yell]},
 'write'		: { 'verb': [["something = strings[0] if strings else lineList[verbIndex+1:[lineList.index(',') if lineList.index(',') else None]]",  'print something'], 'scrawl']  },
 
 # }'''
-# isD = {
-# 'write'		: { 'verb': [["something = joins(lineList[verbIndex+1:])",'print something'], 'scrawl']  },
-# 'write_string'	: { 'verb': [['something = strings[0]','write something'], 'scrawl']  },
-# 'write_then'	: { 'verb': [["something = lineList[verbIndex+1:[lineList.index(',') if lineList.index(',') else None]]",  'print something'], 'scrawl']  },
-# 'shout'		: { 'verb': [['something = strings[0]+"!"','write something'], 'yell']},
-# }
+
+## wont exec args as is, args always parsed to something
 isD = {
 'write'		: { 'verb': [['print something'], 'scrawl']  },
-'write_string'	: { 'verb': [['something = strings[0]','write something'], 'scrawl']  },
-'write_then'	: { 'verb': [["something = lineList[verbIndex+1:[lineList.index(',') if lineList.index(',') else None]]",  'print something'], 'scrawl']  },
+'return'		: { 'verb': [['return something'], 'scrawl']  },
 'shout'		: { 'verb': [['something = "!"','write something'], 'yell']},
+'write_a'	: { 'verb': [['write a'], 'scrawl']  },
+'write_then'	: { 'verb': [["1",  'print something'], 'scrawl']  },
 }
 isSD = re.sub("(\w+)", "'"+"\\1"+"'", isS); #print isSD
 global isD; #isD = eval (isSD); #print isD
@@ -54,7 +51,8 @@ global functionD; functionD = {};
 ## helper functions
 def addQuotes(string): return "'"+string+"'"
 def sliceAt(string, slicePoint): return string[string.index(slicePoint)+len(slicePoint):]
-def joins(list): return " ".join(list)
+def joins(list): return "".join(list)
+def joins_(list): return " ".join(list)
 def splits(string): return string.split(" ")
 
 ## initialization functions
@@ -71,41 +69,36 @@ def getInput(): exec('print 1')
 # if sys.platform = '': is[write] = (v,)
 
 ## main
-def main():	
+def main(line):	
 ## remind verb/function definitions
 	noodle = remindNoodle()
 	global verbD; verbD = dictionaryNoodle(noodle); #print verbD
 	#global isD; #isD = remindNoodleJ(); 
-			
-## do and learn from instructions
-	input = getInstructions(); #print input
-## do input
-	
-	for index,line in enumerate(input):
+	if True:	
 		#line = formatLine(line); 	## parse line
-		if line.startswith("#"): continue ## ignore comments
+		if line.startswith("#"): return ## ignore comments
 		line = line.strip("\n").strip("\r").strip("\t"); # print line ## clean up line
-		if line == '': continue #if line: continue
+		if line == '': return #if line: continue
 		#line = line.strip("\n").strip("\r"); print line ## clean up line, leave tabs
 	#### find strings
-		global strings; strings = re.findall(r"\'(.+?)\'",line); #print strings 
+		'''global strings; strings = re.findall(r"\'(.+?)\'",line); #print strings 
 		for index,string in enumerate(strings): ## replace strings with list item
-			line = line.replace(line[line.index(string)-1:line.index(string)+len(string)+1], strings[index]) #print 2,strings[index]
-		#if line: print '=line: ',line ############
-		if not line: continue 
+			line = line.replace(line[line.index(string)-1:line.index(string)+len(string)+1], strings[index]) #print 2,strings[index]#'''
+		if line: print '=line: ',line ############
+		if not line: return 
 	#### check for contractions and split imperative clauses
 		# if 'and' or 'then' in line:	
 			# lineSplit = line.split("and").split("then")
 			# line[line.index()]
 			# for line in lineSplit:
 		#lineList = line.split(" ",",")## split into list
-		line = line.lower()
+		#line = line.lower() ####
 		#lineList = re.split('(\W+)', line); lineList = [i for i in lineList if i != " "] #print lineList ##########
 		def think(line):
-			global lineList; lineList = re.split('(\W+)', line); lineList = [i for i in lineList if i != " "]
+			global lineList; lineList = re.split('(\W)', line); lineList = [i for i in lineList if i != ""]
 			print '=lineList: ',lineList ########
 		##################### there is an order of operations: set varibles, check standard definitions, check conditionals (simple definitions), compute queries, compute imperatives 
-			kw = lineList[0]; #print kw ### imperative, conditional or query must be indicated by first word
+			kw = lineList[0]; print kw ### imperative, conditional or query must be indicated by first word
 			if not kw: print 'no keyword'
 		############ check for verb definitions or instructions
 			elif kw == "to": 
@@ -134,8 +127,9 @@ def main():
 				evaluate(lineList)'''
 			############ check for variable definition
 			## set variables
-			elif 'is' in lineList: var = joins(lineList[:lineList.index('is')]); assignment = joins(lineList[lineList.index('is')+1:]); print var,"is",assignment ;var = assignment; #continue## print before assignment
-			elif '=' in lineList: var = joins(lineList[:lineList.index('=')]); assignment = joins(lineList[lineList.index('=')+1:]); print var,"is",assignment; var = assignment; #continue
+			elif 'is' in lineList: var = joins(lineList[:lineList.index('is')-1]); assignment = joins(lineList[lineList.index('is')+2:]); print var,"is",assignment; isD[var] = {'noun':assignment}; #global var; var = assignment #continue## print before assignment
+			elif '=' in lineList: var = joins(lineList[:lineList.index('=')-1]); assignment = joins(lineList[lineList.index('=')+2:]); print var,"=",assignment; isD[var] = {'noun':assignment}; print isD#global var; var = assignment #continue
+			
 			
 			############ check for conditionals
 			#if "if" in line: 
@@ -156,26 +150,30 @@ def main():
 			############ check for query
 			elif kw == "what":
 				pass
-			elif kw in isD.keys() or kw in pythonVerbs: 
+			elif kw in pythonVerbs or (kw in isD.keys() and 'verb' in isD[kw].keys()): 
 				imperativeList = lineList
-				global something; something = None
+				global args; #args = None
 				## parse args
-				if strings: something = 'strings[0]'; #print 'o',object1,eval(object1) #############
+				args = string.join(imperativeList[2:],''); print 'argsOG: ',args
+				#if strings: something = 'strings[0]'; #print 'o',object1,eval(object1) #############
 			############ compute imperative statements - verb + args
 				#def computeImperative(verb, *args=None):
 				def computeImperative(imperativeList):
-					global something ######??
-						
+					global args ######??
+					print imperativeList  ########
+					
 				############ parse imperative statements - verb + args
 				## parse verb
 				## sentence structure VO verb-object
 					verb = imperativeList[0]
 					verbIndex = imperativeList.index(verb); #subject = lineList[:verbIndex]; # print subject ## find if subject
 				## parse args
-					if something: pass
-					else: something = joins(imperativeList[verbIndex+1:])
+					if args: print 'args: ',args
+					else: args = string.join(imperativeList[verbIndex+1:],''); print 'args2: ',args
+					if args in isD.keys(): 
+						if 'noun' in isD[args].keys(): args = isD[args]['noun']; print 'args3: ',args
 				## join verb and args
-					definition = joins([verb, something]); print 'def:',definition
+					definition = string.join([verb, args],' '); print 'interp:',definition
 				## try execute definition with Python functions and args defined as string above or in definition
 					if verb in pythonVerbs:
 					## ask to execute
@@ -193,9 +191,14 @@ def main():
 							print index#,definition #############
 							print '=definition:',definition ###########
 							try: 
-								definitionL = definition.split(" ")
-								if "=" in definition: var = joins(definitionL[:definitionL.index('=')]); assignment = joins(definitionL[definitionL.index('=')+1:]); print var,"is",assignment; var = assignment;
-								# definition = definitionL + args; print definition
+								definitionL = definition.split(" "); print definitionL
+								if "=" in definition: pass
+									# var = joins(definitionL[:definitionL.index('=')]); assignment = joins(definitionL[definitionL.index('=')+1:]); print var,"=",assignment; var = assignment; isD[args]['noun'] = assignment
+									# print 11
+									# exec('global a') in globals(), locals()
+									# print 111
+									# print var; print a
+								# definition = definitionL + args; print definition def
 								else: computeImperative(definitionL)
 								# exec(definition) in globals(), locals() ################################### not secure
 							except Exception,e: 
@@ -203,17 +206,20 @@ def main():
 				computeImperative(imperativeList)
 											
 			elif kw not in isD.keys(): print "I don't know how to.. "+kw
-				#exit()
+			elif kw == 'quit': 
+				print 'noodle: ',noodle
+				print 'isD: ',isD
+				#print json.dumps(isD, indent=4, sort_keys=True)
+				input = raw_input("save?")
+				if input == 'y': 
+				## store noodle	
+					append(noodle); 
+				exit()
 			else: print "I don't know what.. "+kw+" ..is"
 			#else: print "???"
-		think(line)
+
 			
-	print 'noodle: ',noodle
-	input = 'n'#raw_input("save?")
-	if input == 'n': exit()
-	## store noodle	
-	append(noodle)
-		
+'''		
 def formatLine(line):
 	## parse line
 	if line.startswith("#"): return ## ignore comments
@@ -224,7 +230,7 @@ def formatLine(line):
 	for index,string in enumerate(strings): ## replace strings with list item
 		line = line.replace(line[line.index(string)-1:line.index(string)+len(string)+1], strings[index]) #print 2,strings[index]
 	return line 
-
+'''
 # def imperative(lineList):
 	#lineList = line.split(" "); 
 	#lineList = re.split('(\W+)', line); #print lineList
@@ -286,8 +292,15 @@ def write(sequence, preposition=False, object2=False):
 	
 # check __main__ to run functions now that defined in any order above
 if __name__=="__main__":
-	main()
-	input = raw_input("")
+## do input from instructions
+	inputList = getInstructions(); #print input
+	#for index,line in enumerate(inputList):
+		#main(line)
+## do input from user
+	line=None
+	while line != 'q':
+		line = raw_input("?"); print line
+		main(line)
 	
 '''
 

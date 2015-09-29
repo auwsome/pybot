@@ -3,10 +3,16 @@
 #write hello
 print 'hello'
 write 'hello'
-#write_string 'hello'
+#write_string 'hello1'
+write 3
+a = 2
+b = 2+3
+write a
+write b
 #write_then 3,
+#add 2 and 5
 
-tts is false
+tts is False
 
 #to shout something, write something+"!"
 shout 'hello'

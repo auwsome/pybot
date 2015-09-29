@@ -5,6 +5,7 @@ import csv, json, urllib2, urlparse
 import mechanize
 try:
 	import pyttsx
+	import translator
 	import serverSCP as s
 except ImportError,e: print str(e)
 
@@ -119,7 +120,7 @@ def main(input=input, *args):
 			input = input.strip('\r')
 				
 			try: exec(input)
-			except Exception,e: print 'err1', str(e)
+			except Exception,e: print 'can\'t exec', str(e)
 			#if input == 'set': continue
 			# if input == 'loop': response = mainLoop()
 			
@@ -147,12 +148,15 @@ def main(input=input, *args):
 			
 			################# direct commands
 			# if input == 'quit': response = ""
-			if input == 'quit': break
+			if input == 'quit' or input == 'q' or input == 'end' or input == 'exit': break
 			if input == 'load': exec('with open(storageFile) as file: list1 = file.readlines()')
 			if input == 'dump': exec('with open(storageFile, "wb") as file: file.writelines(list1)')
 			if input == 'save': PBcreateBranch(); break
 			if input == 'dctn': response = str(dctn); print response, dctn; continue
 			if input == 'done':	choose = False
+			if input == 'a': 
+				line = raw_input("?")
+				response = translator.main(line)
 			
 			# print 3################### keyword based commands
 			
