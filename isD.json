@@ -1,8 +1,8 @@
 {
-'write'		: { 'verb': [['print something'], 'scrawl']  },
-'return'	: { 'verb': [['return something'], 'scrawl']  },
-'shout'		: { 'verb': [['write something','write "!!!"'n], 'yell']},
-'write_a'	: { 'verb': [['write a'], 'scrawl']  },
-'write_then': { 'verb': [["1",  'print something'], 'scrawl']  },
-'verbose'	: {'noun': {'def1': False} },
+"write"		: { "verb": [["print something"], "scrawl"]  },
+"return"	: { "verb": [["return something"], "scrawl"]  },
+"shout"		: { "verb": [["write something","write '!!!'"], "yell"]},
+"write_a"	: { "verb": [["write a"], "scrawl"]  },
+"write_then": { "verb": [["1",  "print something"], "scrawl"]  },
+"verbose"	: {"noun": {"def1": "False"} }
 }

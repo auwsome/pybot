@@ -9,7 +9,7 @@ print "init translator"
 ## imports
 #import translated
 #import nltk
-import re, json, operator, string
+import sys, re, json, operator, string
 #from pyDatalog import pyDatalog
 '''
 from textblob import TextBlob
@@ -61,10 +61,13 @@ def ifKey(*args): ## check if dict has key and return it
 def getFile(file): f = open(file,"rb"); return f.read(); f.close() 
 def writeFile(file): f = open(file,"wb"); return f.read(); f.close()
 def getFileLines(file): f = open(file,"rb"); return f.readlines(); f.close()
-#def getInstructions(): return getFileLines("pseudocode.py")
-def rememberD(dict1): dict1 = json.loads(getFile("isD.json"))
-#def remindNoodle(): return getFile("noodle.txt")
-#def remindNoodleJ(): return json.loads("noodle2.py")
+def getInstructions(): return getFileLines("pseudocode.py")
+if 'arm' in sys.platform: dName = '/storage/sdcard1/isD.json'
+else: dName = "isD.json"
+def rememberD(dict1): 
+	with open(dName) as json_file: dict1 = json.load(json_file) 
+def remindNoodle(): return getFile("noodle.txt")
+def remindNoodleJ(): return json.loads("noodle2.py")
 def dictionaryNoodle(noodle): 
 	for line in noodle: 
 		if line.startswith("to"): verbDef = line[:line.index(",")]; functionString = line[line.index(",")+1:]; functionD[verbDef] = functionString
@@ -72,11 +75,11 @@ def dictionaryNoodle(noodle):
 def getInput(): exec('print 1')
 #return 1 if n <= 1 else n*f(f,n-1)
 # if sys.platform = '': is[write] = (v,)
-def saveD(dict1): json.dump(isD, "isD.json")
+def saveD(dict1): json.dump(isD, dName)
+
 
 ## main
 def main(line):	
-	dict1 = json.loads(getFile("isD.json")); print dict1
 	rememberD(isD)
 	#if verbose: 
 	print isD
@@ -319,7 +322,7 @@ def write(sequence, preposition=False, object2=False):
 # check __main__ to run functions now that defined in any order above
 if __name__=="__main__":
 ## do input from instructions
-	#inputList = getInstructions(); #print input
+	inputList = getInstructions(); #print input
 	#for index,line in enumerate(inputList):
 		#main(line)
 ## do input from user
