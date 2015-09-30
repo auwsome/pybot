@@ -5,7 +5,7 @@ import csv, json, urllib2, urlparse
 import mechanize
 try:
 	import pyttsx
-	import translator
+	import translatorZ
 	import serverSCP as s
 except ImportError,e: print str(e)
 
@@ -97,11 +97,13 @@ def main(input=input, *args):
 	response=None; choose=False; choice=""; YorN=None; words = ['']; link=0; more=0;  more2=0;  more3=0; doChunk=True; responseChunks=[]
 	url='https://en.wikipedia.org/wiki/Main_Page'
 	global droid, prompt, tts
-	exec('with open(storageFile) as file: list1 = file.readlines()')
+	exec('with open(storageFile) as file: list1 = file.readlines()') #in locals(),globals() 
 	#### MAIN LOOP:
+	quit = False; verbose = True#False#
 	#while response is not "":
-	while True:
+	while quit is not True:
 		try:
+			if verbose: print 0
 			################### input and convert to list of words
 			print 'input1=',repr(input), "response1=",response #, "choice=",choice
 			
@@ -110,17 +112,16 @@ def main(input=input, *args):
 				# if not response: print 'noresponse'; input = droid.recognizeSpeech().result#exec(channel)
 				# if choose: print 'choose'; prompt = choice; choice = droid.recognizeSpeech().result; input="choose"#exec(channel)
 				# if not choose and response: input = droid.recognizeSpeech().result # prompt = response+'>'; exec(channel)
-				if not response: prompt = '>'; exec(channel)
+				if response is None: prompt = '>'; exec(channel)
 				#if not choose: prompt = '>'; exec(channel)
 				if choose: print 'choose'; prompt = choice; exec(channel); choice = input.strip('\r'); input = ''; print choice; break
 				#print 1
 				if input is None: time.sleep(7); print 'input is None'; input=""; exec(channel)
 				#else: print "input2=",input;
 				
+			if verbose: print 1
 			input = input.strip('\r')
 				
-			try: exec(input)
-			except Exception,e: print 'can\'t exec', str(e)
 			#if input == 'set': continue
 			# if input == 'loop': response = mainLoop()
 			
@@ -137,6 +138,7 @@ def main(input=input, *args):
 			
 			try: words = input.split(' ')
 			except: pass
+			if verbose: print 2
 			
 			#### set context(s)
 			'''if context: 
@@ -154,27 +156,25 @@ def main(input=input, *args):
 			if input == 'save': PBcreateBranch(); break
 			if input == 'dctn': response = str(dctn); print response, dctn; continue
 			if input == 'done':	choose = False
-			if input == 'a': 
-				line = raw_input("?")
-				response = translator.main(line)
 			
+			if verbose: print 3
 			# print 3################### keyword based commands
 			
 			######## parsing phrase
-			if ' is ' in input and not 'what is ' in input and not words[0] == 'is': 
-				df = input.split(' is ') #definition 
-				try: dctn[df[0]] = df[1]
-				except: print 'error, not entered' #dctn[df[0]]=[df[1]]
-				if df[1] == 'action':
-					dctn[df[0]]={'action':''}
-					response = 'how '+ df[0] +"?" 
-					context = dctn[df[0]]
-				response = 'okay'
+			# if ' is ' in input and not 'what is ' in input and not words[0] == 'is': 
+				# df = input.split(' is ') #definition 
+				# try: dctn[df[0]] = df[1]
+				# except: print 'error, not entered' #dctn[df[0]]=[df[1]]
+				# if df[1] == 'action':
+					# dctn[df[0]]={'action':''}
+					# response = 'how '+ df[0] +"?" 
+					# context = dctn[df[0]]
+				# response = 'okay'
 				
-			if ' is not ' in input: 
-				split= input.split(' is not ') #remove definition 
-				try: dctn[split[0]].remove(split[1])
-				except: pass
+			# if ' is not ' in input: 
+				# split= input.split(' is not ') #remove definition 
+				# try: dctn[split[0]].remove(split[1])
+				# except: pass
 			
 			###### question
 			if '?' in input:	
@@ -206,6 +206,7 @@ def main(input=input, *args):
 				# print str(results)
 				print response
 				
+			if verbose: print 5
 			# print 5######## browse
 			if choose:
 				print 'chooseTrue'
@@ -223,8 +224,9 @@ def main(input=input, *args):
 				print 'choice = ', choice
 				if choice == 'cancel': choose = False
 				
+			if verbose: print 6
 			###### actions
-			if 'e' in input:
+			if input[0] == 'e':
 				exec1 = input.split('e ') #exec
 				try: exec(exec1[1]); continue
 				except Exception,e: print str(e)
@@ -263,6 +265,7 @@ def main(input=input, *args):
 					# if word not in dctn and 'is' not in input:  response = 'what is '+ word +"?"
 				
 			
+			if verbose: print 7
 			#print 7########################### output
 			##if response: print 'endresponse=',response
 			##else: prompt = 'anything else? (yes/no)>'
@@ -304,7 +307,7 @@ def main(input=input, *args):
 					if link in k:  url = v
 				print url; response = go(url); doChunk=True
 			
-				
+			if verbose: print 8	
 			#print 8 ################# chunking starts with objects, lists
 			if tts and response and doChunk and len(response) > 50: 
 				print 'chunking'
@@ -327,6 +330,10 @@ def main(input=input, *args):
 					# response=responseChunks[0]
 				doChunk=False
 				
+#			
+			if response is None: response = translatorZ.main(input); 
+			if verbose: print 'returned2',response
+			
 			# print "endinput="+input
 			input=""
 			print response[0:500]
@@ -334,9 +341,15 @@ def main(input=input, *args):
 				print 'speaking'; 
 				exec(responseChannel) 
 			if not choose: response = ''
-			print 9 
-		except Exception,e: 
-			print 'main='+str(e)
+			if verbose: print 9 
+			
+			try: exec(input)
+			except Exception,e: print 'can\'t exec:', str(e); #input = None
+			response = None; #input = None
+		except Exception as e: 
+			print 'main=',type(e).__name__, e.args 
+			#print 'main='+str(e)
+			response = None; input = None
 			input = raw_input(prompt)
 
 	dumpFiles() 

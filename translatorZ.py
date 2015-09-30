@@ -20,12 +20,13 @@ blob.tags'''
 global isD; 
 ## wont exec args as is, args always parsed to something
 isD = {
-'write'		: { 'verb': [['print something'], 'scrawl']  },
-'return'		: { 'verb': [['return something'], 'scrawl']  },
-'shout'		: { 'verb': [['write something','write "!!!"'], 'yell']},
-'write_a'	: { 'verb': [['write a'], 'scrawl']  },
-'write_then'	: { 'verb': [["1",  'print something'], 'scrawl']  },
-'verbose'	: {'noun': {'def1': False} },
+"write"		: { "verb": [["print something"], "scrawl"]  },
+"return"	: { "verb": [["return something"], "scrawl"]  },
+"result"	: { "verb": [["result something"], "scrawl"]  },
+"shout"		: { "verb": [["write something","write '!!!'"], "yell"]},
+"write_a"	: { "verb": [["write a"], "scrawl"]  },
+"write_then": { "verb": [["1",  "print something"], "scrawl"]  },
+"verbose"	: {"noun": {"def1": "True"} }
 }
 isD0 = isD
 #isSD = re.sub("(\w+)", "'"+"\\1"+"'", isS); ## adds quotes around single words
@@ -33,7 +34,7 @@ isD0 = isD
 print 'isD: ',isD 
 
 ## global variables
-global pythonVerbs; pythonVerbsString = 'print,operator.add(something,b)'; pythonVerbs = pythonVerbsString.split(","); print pythonVerbs
+global pythonVerbs; pythonVerbsString = 'result,print,return,operator.add(something,b)'; pythonVerbs = pythonVerbsString.split(","); print pythonVerbs
 global verbsL; verbsString = 'write,make,create'; verbsL = verbsString.split(","); #print verbs
 global prepositions; prepositionsString = 'in ,into ,over '; prepositions = prepositionsString.split(",")
 global functionD; functionD = {}; 
@@ -202,7 +203,9 @@ def main(line):
 				input = 'y'# raw_input("try: "+definition+" ?")
 				if input == 'y':	
 					try: 
-						exec(definition) in globals(), locals();  ################################### not secure
+						if verbose: print 'returned1',definition
+						if verb == 'result': global result; result = args
+						else: exec(definition) in globals(), locals();  ################################### not secure
 					except Exception,e: 
 						print 'error exec Python verb: '+str(e)
 		## try execute definition with verb definitions and args 
@@ -222,11 +225,14 @@ def main(line):
 							# print 111
 							# print var; print a
 						# definition = definitionL + args; print definition def
+						#elif: return 
 						else: computeImperative(definitionL)
 						# exec(definition) in globals(), locals() ################################### not secure
 					except Exception,e: 
 						print 'error exec verb 1: '+str(e)
 		computeImperative(imperativeList)
+		if verbose: print 'result',result
+	
 									
 	elif kw == 'quit': 
 		print 'noodle: ',noodle
@@ -241,6 +247,7 @@ def main(line):
 	elif kw not in isD.keys(): print "I don't know how to.. "+kw
 	else: print "I don't know what.. "+kw+" ..is"
 	#else: print "???"
+	return result	
 			
 '''		
 def formatLine(line):
