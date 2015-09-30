@@ -5,14 +5,16 @@ imports
 isD starting definition
 
 '''
+print "init translator"
 ## imports
 #import translated
-import nltk, re, json, operator, string
+#import nltk
+import re, json, operator, string
 #from pyDatalog import pyDatalog
-
+'''
 from textblob import TextBlob
 blob = TextBlob("write 'hello, how are you?' into a file")
-blob.tags
+blob.tags'''
 
 
 global isD; 
@@ -59,7 +61,7 @@ def ifKey(*args): ## check if dict has key and return it
 def getFile(file): f = open(file,"rb"); return f.read(); f.close() 
 def writeFile(file): f = open(file,"wb"); return f.read(); f.close()
 def getFileLines(file): f = open(file,"rb"); return f.readlines(); f.close()
-def getInstructions(): return getFileLines("pseudocode.py")
+#def getInstructions(): return getFileLines("pseudocode.py")
 def rememberD(dict1): dict1 = json.loads(getFile("isD.json"))
 #def remindNoodle(): return getFile("noodle.txt")
 #def remindNoodleJ(): return json.loads("noodle2.py")
@@ -74,7 +76,7 @@ def saveD(dict1): json.dump(isD, "isD.json")
 
 ## main
 def main(line):	
-	dict1 = json.loads(getFile("isD.json")) print dict1
+	dict1 = json.loads(getFile("isD.json")); print dict1
 	rememberD(isD)
 	#if verbose: 
 	print isD
@@ -317,7 +319,7 @@ def write(sequence, preposition=False, object2=False):
 # check __main__ to run functions now that defined in any order above
 if __name__=="__main__":
 ## do input from instructions
-	inputList = getInstructions(); #print input
+	#inputList = getInstructions(); #print input
 	#for index,line in enumerate(inputList):
 		#main(line)
 ## do input from user
