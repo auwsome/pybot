@@ -51,7 +51,33 @@ def sliceAt(string, slicePoint): return string[string.index(slicePoint)+len(slic
 def joins(list): return "".join(list)
 def joins_(list): return " ".join(list)
 def splits(string): return string.split(" ")
-def ifKey(*args): ## check if dict has key and return it
+def ifNotNoneReturnIt(thing): return thing if thing else None
+def ifItemReturnIt(container,index): if len(container)>=index: return container[index]
+def ifKeyReturnValue(dictA, keyA): ## check if dict has key and return it
+	return dictA[keyA] if dictA[keyA] in isD.keys() else None
+ifKey(dict, keyA, keyB, keyC)
+def ifKeysReturnValue(*args): ## check if dict has key and return it
+	#key0 = args[0]; key1 = ifItemReturnIt(args,1)); key2 = ifItemReturnIt(args,2))
+	for x,key in args:
+	value0 = ifKeyReturnValue(dict0, key0)
+	if type(value0) == 'str' : return value0
+	if type(value0) == 'list': return value0
+	if type(value0) == 'dict': dictA = value0
+	value1 = ifKeyReturnValue(dictA, key1); 
+	if type(value1) == 'str' : return value1
+	if type(value1) == 'list': return value1
+	if type(value1) == 'dict': dictB = value1
+	value2 = ifKeyReturnValue(dictB, key2); 
+	if type(value2) == 'str' : return value2
+	if type(value2) == 'list': return value2
+	if type(value2) == 'dict': return value2
+	
+	#i = ifKeyReturnValue(ifKeyReturnValue(dictA, key1), key0); return i if i else None
+	# if ifItemReturnIt(args,0): return ifKeyReturnValue(dictA, ifItemReturnIt(args,0))
+	# if ifItemReturnIt(args,1): return ifKeyReturnValue(ifKeyReturnValue(dictA, ifItemReturnIt(args,0)), ifItemReturnIt(args,0))
+	# for x,i in enumerate(args): 
+		# return ifKeyReturnValue(dictA, ifItemReturnIt(args,i))
+def returnDeepest(): 
 	if args[0] in isD.keys():
 		if len(args)>1 and args[1] in isD[args[0]].keys():
 			if len(args)>2 and args[2] in isD[args[0]][args[1]].keys(): return isD[args[0]][args[1]][args[2]]
