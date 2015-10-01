@@ -85,8 +85,9 @@ def getFile(file): f = open(file,"rb"); return f.read(); f.close()
 def writeFile(file): f = open(file,"wb"); return f.read(); f.close()
 def getFileLines(file): f = open(file,"rb"); return f.readlines(); f.close()
 def getInstructions(): return getFileLines("pseudocode.py")
-if 'arm' in sys.platform: dName = '/storage/sdcard1/isD.json'
-else: dName = "isD.json"
+#if 'arm' in sys.platform: dName = '/storage/sdcard1/isD.json'
+#else: 
+dName = "isD.json"
 def rememberD(dict1): 
 	with open(dName) as json_file: dict1 = json.load(json_file) 
 def remindNoodle(): return getFile("noodle.txt")
