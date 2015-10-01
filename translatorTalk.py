@@ -24,36 +24,47 @@ blob = TextBlob("write 'hello, how are you?' into a file")
 blob.tags'''
 
 
+## global variables
+#global pythonVerbsL; pythonVerbsString = 'print,exec,operator.add(something,b)'; pythonVerbsL = pythonVerbsString.split(","); print pythonVerbsL
+#global verbsL; verbsString = 'write,make,create'; verbsL = verbsString.split(","); #print verbs
+#global prepositions; prepositionsString = 'in ,into ,over '; prepositions = prepositionsString.split(",")
+global functionD; functionD = {}; global pythonVerbsL; 
 global isD; isD = {}
-global verbose; verbose = True
+global verbose; verbose = True; global tts; tts = True
+
 ## wont exec args as is, args always parsed to something
 isD = {
-"write"		: { "verb": {"mydef": [["print something"], "scrawl"]  }},
-"return"	: { "verb": {"mydef": [["return something"], ""]  }},
-"result"	: { "verb": {"mydef": [["result something"], ""]  }},
-"shout"		: { "verb": {"mydef": [["write something","write '!!!'"], "yell"]}},
-"dict"	: {"noun": {"mydef": "isD"} }, 
-"tts"	: {"noun": {"mydef": "True"} },
-"verbose"	: {"noun": {"mydef": "True"} }
+"write"		:{"verb": {"mydef": ["print something"]  }},
+"speak"		:{"verb": {"mydef": ["exec 'responseChannel'"]  }},
+"say"		:{"verb": {"mydef": ["print something", "speak something"]  }},
+"shout"		:{"verb": {"mydef": ["write something","write '!!!'"], "otherdef": "yell"  }},    
+"save"		:{"verb": {"mydef": ["exec 'saveD()'"]  }},
+"dict"		:{"noun": {"mydef": "isD"} }, 
+"tts"		:{"noun": {"mydef": "True"} },
+"verbose"	:{"noun": {"mydef": "True"} }
 }; isD0 = isD
 #isSD = re.sub("(\w+)", "'"+"\\1"+"'", isS); ## adds quotes around single words
 # a.setdefault("somekey",[]).append("bob")
 print 'isD: ',isD 
 
-## global variables
-global pythonVerbs; pythonVerbsString = 'print,exec,operator.add(something,b)'; pythonVerbs = pythonVerbsString.split(","); print pythonVerbs
-global verbsL; verbsString = 'write,make,create'; verbsL = verbsString.split(","); #print verbs
-global prepositions; prepositionsString = 'in ,into ,over '; prepositions = prepositionsString.split(",")
-global functionD; functionD = {}; 
-
 ## helper functions
-def addQuotes(stringA): return "'"+stringA+"'"
 def sliceAt(stringA, slicePoint): return stringA[stringA.index(slicePoint)+len(slicePoint):]
 def joins(listA): return "".join(listA)
 def joins_(listA): return " ".join(listA)
 def splits(stringA): return stringA.split(" ")
-def printA(item): print item+":",eval(item)
-#def ifNotNoneReturnIt(thing): if thing: return thing;  else: return None
+def tryExcept(tryA, exceptA):
+	try:
+		tryA
+	except: ExceptA
+def forItem(container,operation): 
+	for item in container: exec(operation)
+#def ifNotNoneReturnIt(item): return item if item else None  ## only if checking item doesn't throw exception
+def ifVerbose(*args): return args if verbose else None 
+def printIfVerbose(stringOfItem): print ifVerbose(stringOfItem+"=",eval(stringOfItem))
+def printV(*args): 
+	if args[0]: forItem(args,'printIfVerbose(item)')
+#verbose=True; a='b'; c='d'; printV('a','c')
+def addQuotes(stringA): return "'"+stringA+"'"
 def ifKeyNotNoneReturnIt(dictA,keyA): 
 	if keyA in dictA.keys(): return dictA[keyA]  
 	else: return None
@@ -67,18 +78,11 @@ def ifKeysReturnValue(dict0=isD, *args): ## check if dict has key and return it
 	for key in args: 
 		value = ifKeyReturnValue(key,isD)#value); ##################
 		return value if not isinstance(value, dict) else None
-def returnDeepest(): 
-	if args[0] in isD.keys():
-		if len(args)>1 and args[1] in isD[args[0]].keys():
-			if len(args)>2 and args[2] in isD[args[0]][args[1]].keys(): return isD[args[0]][args[1]][args[2]]
-			else: return isD[args[0]][args[1]] 
-		else: return isD[args[0]]
-	else: return None
-	#return (isD[args[0]][args[1]][args[2]] if args[2] in isD[args[0]][args[1]].keys() else   (isD[args[0]][args[1]] if args[1] in isD[args[0]].keys() else   (isD[args[0]] if args[0] in isD.keys() else None)))
-	#return (3 if 3>3 else   (2 if 2>2 else   (1 if 1>0 else None)))x
-
-	#except Exception as e: print type(e).__name__, e.args
-	#
+def parseArgs(listA): 
+	args = string.join(listA[2:],'')
+	if args in isD.keys() and 'noun' in isD[args].keys(): args = isD[args]['noun']['mydef']
+	return args
+def str2bool(v): return v.lower() in ("yes", "true", "t", "1")
 	
 ## initialization functions
 def getFile(file): f = open(file,"rb"); return f.read(); f.close() 
@@ -96,7 +100,6 @@ def dictionaryNoodle(noodle):
 	for line in noodle: 
 		if line.startswith("to"): verbDef = line[:line.index(",")]; functionString = line[line.index(",")+1:]; functionD[verbDef] = functionString
 	return functionD
-def getInput(): exec('print 1')
 #return 1 if n <= 1 else n*f(f,n-1)
 # if sys.platform = '': is[write] = (v,)
 def saveD(dict1): json.dump(isD, dName)
@@ -106,18 +109,20 @@ def saveD(dict1): json.dump(isD, dName)
 # x = Bunch(isD); print x.write
 
 
-global response; response = []
+global response; response = []; global args; args = None
 rememberD(isD)
 ############ main
 def main(line):	
-	global tts; locals().update(globals()); response = []  
-	#if verbose: 
-	verbose = False #bool(ifKeysReturnValue("verbose",'noun','mydef')); print 1; printA('verbose'); print verbose
-	# if verbose == "False": verbose = False#True#
-	# if verbose == "True": verbose = True
-	tts = True#bool(ifKeysReturnValue("tts",'noun','mydef'))
+	printV('sys.platform','isD')
+	global response ## puts global into locals
+	global verbose; global tts; 
+	#locals().update(globals()); 
+	#print 2,ifKeysReturnValue("verbose",'noun','mydef'); 
+	verbose = str2bool(isD['verbose']['noun']['mydef']); 
+	print verbose
+	tts = str2bool(isD['tts']['noun']['mydef'])#bool(ifKeysReturnValue("tts",'noun','mydef'))
 	#if isD["verbose"] == {'noun':"True"}:  verbose = True#
-	if verbose: print 'verbose', sys.platform; print isD; print 'tts:',tts
+	printV('response','verbose','tts','args')
 ## remind verb/function definitions
 	noodle = remindNoodle()
 	global verbD; verbD = dictionaryNoodle(noodle); #print verbD
@@ -142,10 +147,12 @@ def main(line):
 	#lineList = line.split(" ",",")## split into list
 	#line = line.lower() ####
 	#lineList = re.split('(\W+)', line); lineList = [i for i in lineList if i != " "] #print lineList ##########
-	global lineList; lineList = re.split('(\W)', line); lineList = [i for i in lineList if i != ""]
+	lineList = re.split('(\W)', line); lineList = [i for i in lineList if i != ""]
 	if verbose: print '=lineList: ',lineList ########
 ##################### there is an order of operations: check/set variables, check standard definitions, check conditionals (simple definitions), compute queries, compute imperatives 
 	kw = lineList[0]; 
+	'''pythonVerbsL'''
+	pythonVerbsString = 'print,exec,operator.add(something,b)'; pythonVerbsL = pythonVerbsString.split(",")
 	if verbose: print 'kw=',kw ### imperative, conditional or query must be indicated by first word
 	if not kw: print 'no keyword'
 	############ check/set for variable definition
@@ -155,8 +162,8 @@ def main(line):
 		response=[isD[line]['noun']['mydef']]; #response.append(isD[line])
 		if response[0] == 'isD': print response; #response[0] = isD
 	## set variables as key and values
-	elif 'is' in lineList: var = joins(lineList[:lineList.index('is')-1]); assignment = joins(lineList[lineList.index('is')+2:]); print var,"is",assignment; isD[var] = {'noun':{'mydef':assignment}}; exec('if verbose: print isD') in locals(),globals() ## print before assignment
-	elif '=' in lineList: var = joins(lineList[:lineList.index('=')-1]); assignment = joins(lineList[lineList.index('=')+2:]); print var,"=",assignment; isD[var] = {'noun':{'mydef':assignment}}; exec('if verbose: print isD') in locals(),globals()  #global var; var = assignment #continue
+	elif 'is' in lineList: var = joins(lineList[:lineList.index('is')-1]); assignment = joins(lineList[lineList.index('is')+2:]); print var,"is",assignment; isD[var] = {'noun':{'mydef':assignment}}; printV('isD') ## print before assignment
+	elif '=' in lineList: var = joins(lineList[:lineList.index('=')-1]); assignment = joins(lineList[lineList.index('=')+2:]); print 'okay,',var,"=",assignment; isD[var] = {'noun':{'mydef':assignment}}; printV('isD') 
 	############ check for verb definitions or instructions
 	elif kw == "to": 
 		verbL = lineList[lineList.index("to"):lineList.index(",")]
@@ -193,57 +200,54 @@ def main(line):
 				instructionWhole = line[line.index(',')+1:]
 				if 'then' in instructionWhole: instructionWhole = instructionWhole.lstrip("then ")
 				verbD[command] = instructionWhole
-	############ check for query
+	############ check for ***QUERY***
 	elif kw == "what":
 		pass
-	elif kw in pythonVerbs or (kw in isD.keys() and 'verb' in isD[kw].keys()): 
+	############ compute ***IMPERATIVE*** statements - verb + args
+	elif kw in pythonVerbsL or (kw in isD.keys() and 'verb' in isD[kw].keys()): 
 		imperativeList = lineList
-		global args; #args = None
 		## parse args
-		args = string.join(imperativeList[2:],''); #print('args0: ',args) if verbose else "",
-		args = isD[args]['noun']['mydef'] if args in isD.keys() and 'noun' in isD[args].keys() else args
-		if verbose: print('args0: ',args) 
-		#if strings: something = 'strings[0]'; #print 'o',object1,eval(object1) #############
-	############ compute imperative statements - verb + args
-		#def computeImperative(verb, *args=None):
+		if not args: print 23
+		global args; ## puts local into globals?
+		args = parseArgs(imperativeList); 
+		if verbose: print 'args0:',args
 		def computeImperative(imperativeList):
-			locals().update(globals())
-			global args#, response ######??
-			if verbose: print imperativeList  ########
-			
+			#locals().update(globals()); printV('args'); 
+			global args ## puts global into locals
+			global response; global tts; 
+			# if 'args' in globals(): print 1,args
+			# if 'args' in locals(): print 2,args
+			#printV('imperativeList')
+			if verbose: print('imperativeList:',imperativeList) 
 		############ parse imperative statements - verb + args
-		## parse verb
 		## sentence structure VO verb-object
-			verb = imperativeList[0]
-			verbIndex = imperativeList.index(verb); #subject = lineList[:verbIndex]; # print subject ## find if subject
+		## parse verb
+			verb = imperativeList[0]; verbIndex = imperativeList.index(verb); 
+			#print locals()
+			#args = string.join(imperativeList[verbIndex+1:],''); #print 'args2: ',args
 		## parse args
-			if args: pass #print('args: ',args) if verbose else "",
-			else: #args = string.join(imperativeList[verbIndex+1:],''); #print 'args2: ',args
-				args = isD[args]['noun']['mydef'] if args in isD.keys() and 'noun' in isD[args].keys() else string.join(imperativeList[verbIndex+1:],'')
-			if verbose: print('args1: ',args) 
-			#if args in isD.keys(): args = isD[args]['noun'] if 'noun' in isD[args].keys() 
-				#if 'noun' in isD[args].keys(): args = isD[args]['noun']; #print 'args3: ',args
+			print 1;printV('args') 
+			args = args if args else parseArgs(imperativeList); #
+			print 2;printV('args') 
 		## join verb and args
-			definition = string.join([verb, args],' ');
+			definition = string.join([verb, args],' '); #globals().update(locals()); 
+			#printV('verb','args','definition') 
 			if verbose: print 'verb',verb,'args',args,'interp:',definition
-		## try execute definition with Python functions and args defined as string above or in definition
-			if verb in pythonVerbs:
+			'''EXECUTE'''## try ___EXECUTE///////\\\\\''''''|||*** definition with Python functions and args defined as string above or in definition
+			if verb in pythonVerbsL:
 			## ask to execute
 				input = 'y'# raw_input("try: "+definition+" ?")
 				if input == 'y':	
 					try: 
 						interpretation = string.join([verb+"("+args+")"],''); print 'interp:',interpretation 
 						exec(interpretation) in globals(), locals();  ################################### not secure
-						if tts: response.append(args); globals().update(locals()); print args; #print 1345623,response
-						#if tts: response = args; globals().update(locals()); #print args; print 1345623,response
-						#if verbose: printA('response[0]')#print 'response',response
-					except Exception,e: 
-						print 'error exec Python verb: '+str(e)
+						if tts: response.append(args); globals().update(locals()); printV('args'); printV('response')
+					except Exception,e: print 'myerror: exec pyverb: '+str(e)
 		## try execute definition with verb definitions and args 
 			if verb in isD.keys():
-				if type(isD[verb]['verb']['mydef'][0]) is not list: print 'verb is not executable'
+				if type(isD[verb]['verb']['mydef']) is not list: print 'verb is not executable'
 		## loop through definitions and execute with args
-				for index,definition in enumerate(isD[verb]['verb']['mydef'][0]): 
+				for index,definition in enumerate(isD[verb]['verb']['mydef']): 
 					if verbose: print index#,definition #############
 					if verbose: print '=definition:',definition ###########
 					try: 
@@ -251,8 +255,7 @@ def main(line):
 						if verbose: print definitionL
 						if "=" in definition: pass
 						else: computeImperative(definitionL)
-					except Exception,e: 
-						print 'error exec verb 1: '+str(e)
+					except Exception,e: print 'myerror: exec verb: '+str(e)
 		computeImperative(imperativeList)
 									
 	elif kw == 'quit': 
@@ -261,15 +264,16 @@ def main(line):
 		input = raw_input("save?"); saveD() if input == 'y' else None; exit()
 	elif kw not in isD.keys(): print "I don't know how to.. "+kw
 	else: print "I don't know what.. "+kw+" ..is"
+	printV('response')
 	#globals().update(locals())
 	if response:
-		#print 1; printA('response')
+		print 10; printV('response')
 		for x,i in enumerate(response):
 			response = i; print response
 			if not tts: print response 
-			if tts and response: print 'speaking.. '+response; droid.ttsSpeak(response)#exec(responseChannel) in locals(),globals() 
-			response = None
-			return response
+			if tts and response: print 'speaking.. '+response; exec(responseChannel) in locals(),globals(); print responseChannel #droid.ttsSpeak(response)#			
+		response = [];#	response = []; print response;
+	return response
 			
 			
 def saveD(dict1=isD):
@@ -307,15 +311,16 @@ if __name__=="__main__":
 	if sys.platform == 'win32': 
 		#from bs4 import BeautifulSoup
 		#import bs4 as BeautifulSoup
-		dictName = realcwd+'\dict.json'
-		cmdsName = realcwd+'\commands.json'
-		prompt='p>'
+		# dictName = realcwd+'\dict.json'
+		# cmdsName = realcwd+'\commands.json'
+		prompt='>'
 		tts = True
-		channel = "input = raw_input(prompt)"
+		channel = "engine.say(prompt); engine.runAndWait();input = raw_input(prompt)"
 		engine = pyttsx.init()
 		rate = engine.getProperty('rate')
 		engine.setProperty('rate', rate-25)
-		if tts:	responseChannel = 'engine.say(response); engine.runAndWait()'
+		#if tts:	
+		responseChannel = 'engine.say(response); engine.runAndWait()'
 		storageFile = 'PybotLines.py'
 	#### android
 	if 'arm' in sys.platform:# == 'linux-armv71': 
@@ -327,7 +332,7 @@ if __name__=="__main__":
 		droid = android.Android(); d = droid
 		tts = True
 		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
-		channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech("test",None,None).result'
+		channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
 		args = droid.getIntent().result[u'extras']
 		print args
 		try: 
@@ -342,11 +347,12 @@ if __name__=="__main__":
 ## do input from user
 	line=None
 	#while line != 'q':
-	while line is None:
+	response = 'hi'; exec(responseChannel); response = []; prompt = '>'; 
+	while not line:
 		#line = raw_input("?"); #print line
-		prompt = 'ready'; exec(channel)
+		exec(channel)
 		if input is None: time.sleep(7); print 'input is None';
-		else: line = main(input)
+		else: line = main(input); #print line
 	
 '''
 
