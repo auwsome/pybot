@@ -263,8 +263,9 @@ def main(line):
 	if response:
 		#print 1; printA('response')
 		for x,i in enumerate(response):
-			if not tts: print i 
-			if tts and response: print 'speaking.. ',i; exec(responseChannel) in locals(),globals() 
+			response = i
+			if not tts: print response 
+			if tts and response: print 'speaking.. ',response; exec(responseChannel) in locals(),globals() 
 			response = None
 			
 			
