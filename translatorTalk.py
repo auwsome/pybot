@@ -105,11 +105,12 @@ def saveD(dict1): json.dump(isD, dName)
     # self.__dict__.update(adict)
 # x = Bunch(isD); print x.write
 
+
+global response; response = []
 rememberD(isD)
-## main
+############ main
 def main(line):	
-	global tts;  global response; 
-	response = []
+	global tts; locals().update(globals()); response = []  
 	#if verbose: 
 	verbose = False #bool(ifKeysReturnValue("verbose",'noun','mydef')); print 1; printA('verbose'); print verbose
 	# if verbose == "False": verbose = False#True#
@@ -124,6 +125,7 @@ def main(line):
 	#line = formatLine(line); 	## parse line
 	if line.startswith("#"): return ## ignore comments
 	line = line.strip("\n").strip("\r").strip("\t"); # print line ## clean up line
+	line = line.replace("quote","'").replace("unquote","'"); # print line ## clean up line
 	if line == '': return #if line: continue
 	#line = line.strip("\n").strip("\r"); print line ## clean up line, leave tabs
 #### find strings
@@ -232,7 +234,7 @@ def main(line):
 					try: 
 						interpretation = string.join([verb+"("+args+")"],''); print 'interp:',interpretation 
 						exec(interpretation) in globals(), locals();  ################################### not secure
-						if tts: response.append(args); globals().update(locals()); #print args; print 1345623,response
+						if tts: response.append(args); globals().update(locals()); print args; #print 1345623,response
 						#if tts: response = args; globals().update(locals()); #print args; print 1345623,response
 						#if verbose: printA('response[0]')#print 'response',response
 					except Exception,e: 
@@ -263,10 +265,11 @@ def main(line):
 	if response:
 		#print 1; printA('response')
 		for x,i in enumerate(response):
-			response = i
+			response = i; print response
 			if not tts: print response 
-			if tts and response: print 'speaking.. ',response; exec(responseChannel) in locals(),globals() 
+			if tts and response: print 'speaking.. '+response; droid.ttsSpeak(response)#exec(responseChannel) in locals(),globals() 
 			response = None
+			return response
 			
 			
 def saveD(dict1=isD):
@@ -324,7 +327,7 @@ if __name__=="__main__":
 		droid = android.Android(); d = droid
 		tts = True
 		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
-		channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech().result'
+		channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech("test",None,None).result'
 		args = droid.getIntent().result[u'extras']
 		print args
 		try: 
@@ -338,9 +341,12 @@ if __name__=="__main__":
 		#main(line)
 ## do input from user
 	line=None
-	while line != 'q':
-		line = raw_input("?"); #print line
-		main(line)
+	#while line != 'q':
+	while line is None:
+		#line = raw_input("?"); #print line
+		prompt = 'ready'; exec(channel)
+		if input is None: time.sleep(7); print 'input is None';
+		else: line = main(input)
 	
 '''
 
