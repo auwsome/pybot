@@ -296,41 +296,41 @@ def write(sequence, preposition=False, object2=False):
 	
 # check __main__ to run functions now that defined in any order above
 if __name__=="__main__":
-######## check and set environment
-print sys.platform
-#### win32+'>')"
-# btw, command line needs to have prefix running script with 'python'
-if sys.platform == 'win32': 
-	#from bs4 import BeautifulSoup
-	#import bs4 as BeautifulSoup
-	dictName = realcwd+'\dict.json'
-	cmdsName = realcwd+'\commands.json'
-	prompt='p>'
-	tts = True
-	channel = "input = raw_input(prompt)"
-	engine = pyttsx.init()
-	rate = engine.getProperty('rate')
-	engine.setProperty('rate', rate-25)
-	if tts:	responseChannel = 'engine.say(response); engine.runAndWait()'
-	storageFile = 'PybotLines.py'
-#### android
-if 'arm' in sys.platform:# == 'linux-armv71': 
-	#dictName = '/storage/sdcard1/dict.json'
-	#cmdsName = '/storage/sdcard1/commands.json'
-	import android 
-	#from BeautifulSoup import BeautifulSoup
-	#from bs4 import BeautifulSoup
-	droid = android.Android(); d = droid
-	tts = True
-	#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
-	channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech().result'
-	args = droid.getIntent().result[u'extras']
-	print args
-	try: 
-		if args: input = args['%avcomm']; print input
-	except: pass
-	responseChannel = 'droid.ttsSpeak(response);exec("while droid.ttsIsSpeaking().result: pass")'
-	#storageFile = realcwd+'/PybotLines.py'
+	######## check and set environment
+	print sys.platform
+	#### win32+'>')"
+	# btw, command line needs to have prefix running script with 'python'
+	if sys.platform == 'win32': 
+		#from bs4 import BeautifulSoup
+		#import bs4 as BeautifulSoup
+		dictName = realcwd+'\dict.json'
+		cmdsName = realcwd+'\commands.json'
+		prompt='p>'
+		tts = True
+		channel = "input = raw_input(prompt)"
+		engine = pyttsx.init()
+		rate = engine.getProperty('rate')
+		engine.setProperty('rate', rate-25)
+		if tts:	responseChannel = 'engine.say(response); engine.runAndWait()'
+		storageFile = 'PybotLines.py'
+	#### android
+	if 'arm' in sys.platform:# == 'linux-armv71': 
+		#dictName = '/storage/sdcard1/dict.json'
+		#cmdsName = '/storage/sdcard1/commands.json'
+		import android 
+		#from BeautifulSoup import BeautifulSoup
+		#from bs4 import BeautifulSoup
+		droid = android.Android(); d = droid
+		tts = True
+		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
+		channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech().result'
+		args = droid.getIntent().result[u'extras']
+		print args
+		try: 
+			if args: input = args['%avcomm']; print input
+		except: pass
+		responseChannel = 'droid.ttsSpeak(response);exec("while droid.ttsIsSpeaking().result: pass")'
+		#storageFile = realcwd+'/PybotLines.py'
 ## do input from instructions
 	inputList = getInstructions(); #print input
 	#for index,line in enumerate(inputList):
