@@ -1,5 +1,85 @@
 {
-"write"		: { "verb": [["print something"], "scrawl"]  },
-"shout"		: { "verb": [["write something","write '!!!'"], "yell"]},
-"verbose"	: {"noun": {"def1": "True"} }
+    "dict": {
+        "noun": {
+            "mydef": "isD"
+        }
+    }, 
+    "result": {
+        "verb": {
+            "mydef": [
+                [
+                    "result something"
+                ], 
+                ""
+            ]
+        }
+    }, 
+    "return": {
+        "verb": {
+            "mydef": [
+                [
+                    "return something"
+                ], 
+                ""
+            ]
+        }
+    }, 
+    "save": {
+        "verb": {
+            "mydef": [
+                [
+                    "exec 'saveD()'"
+                ]
+            ]
+        }
+    }, 
+    "say": {
+        "verb": {
+            "mydef": [
+                [
+                    "write something"
+                ]
+            ]
+        }
+    }, 
+    "say hi": {
+        "verb": {
+            "mydef": [
+                [
+                    "say 'hi'"
+                ]
+            ]
+        }
+    }, 
+    "shout": {
+        "verb": {
+            "mydef": [
+                [
+                    "write something", 
+                    "write '!!!'"
+                ], 
+                "yell"
+            ]
+        }
+    }, 
+    "tts": {
+        "noun": {
+            "mydef": "True"
+        }
+    }, 
+    "verbose": {
+        "noun": {
+            "mydef": "True"
+        }
+    }, 
+    "write": {
+        "verb": {
+            "mydef": [
+                [
+                    "print something"
+                ], 
+                "scrawl"
+            ]
+        }
+    }
 }

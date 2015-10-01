@@ -1,0 +1,66 @@
+{
+    "dict": {
+        "noun": {
+            "mydef": "isD"
+        }
+    }, 
+    "result": {
+        "verb": [
+            [
+                "result something"
+            ], 
+            ""
+        ]
+    }, 
+    "return": {
+        "verb": [
+            [
+                "return something"
+            ], 
+            ""
+        ]
+    }, 
+    "save": {
+        "verb": [
+            [
+                "saveD(isD)"
+            ], 
+            ""
+        ]
+    }, 
+    "shout": {
+        "verb": [
+            [
+                "write something", 
+                "write '!!!'"
+            ], 
+            "yell"
+        ]
+    }, 
+    "tts": {
+        "noun": {
+            "mydef": "True"
+        }
+    }, 
+    "verbose": {
+        "noun": {
+            "mydef": "False"
+        }
+    }, 
+    "write": {
+        "verb": [
+            [
+                "print something"
+            ], 
+            "scrawl"
+        ]
+    }, 
+    "write_a": {
+        "verb": [
+            [
+                "write a"
+            ], 
+            ""
+        ]
+    }
+}

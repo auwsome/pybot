@@ -13,6 +13,9 @@ import sys, re, json, operator, string
 try:
 	import pyttsx
 	from Pybot import responseChannel, engine
+	# engine.say('test'); engine.runAndWait()
+	# responseChannel = 'engine.say(response); engine.runAndWait()'
+	# response = 'test'; exec(responseChannel)
 except ImportError,e: print str(e)
 #from pyDatalog import pyDatalog
 '''
@@ -22,19 +25,17 @@ blob.tags'''
 
 
 global isD; isD = {}
+global verbose; verbose = True
 ## wont exec args as is, args always parsed to something
 isD = {
-"write"		: { "verb": [["print something"], "scrawl"]  },
-"return"	: { "verb": [["return something"], ""]  },
-"result"	: { "verb": [["result something"], ""]  },
-"shout"		: { "verb": [["write something","write '!!!'"], "yell"]},
-"write_a"	: { "verb": [["write a"], ""]  },
-"save"	: { "verb": [[ "saveD(isD)"], ""]  },
-"dict"	: {'noun': {'mydef': 'isD'} }, 
-'tts'	: {'noun': {'mydef': 'True'} },
-"verbose"	: {"noun": {"mydef": "False"} }
-}
-isD0 = isD
+"write"		: { "verb": {"mydef": [["print something"], "scrawl"]  }},
+"return"	: { "verb": {"mydef": [["return something"], ""]  }},
+"result"	: { "verb": {"mydef": [["result something"], ""]  }},
+"shout"		: { "verb": {"mydef": [["write something","write '!!!'"], "yell"]}},
+"dict"	: {"noun": {"mydef": "isD"} }, 
+"tts"	: {"noun": {"mydef": "True"} },
+"verbose"	: {"noun": {"mydef": "True"} }
+}; isD0 = isD
 #isSD = re.sub("(\w+)", "'"+"\\1"+"'", isS); ## adds quotes around single words
 # a.setdefault("somekey",[]).append("bob")
 print 'isD: ',isD 
@@ -46,37 +47,26 @@ global prepositions; prepositionsString = 'in ,into ,over '; prepositions = prep
 global functionD; functionD = {}; 
 
 ## helper functions
-def addQuotes(string): return "'"+string+"'"
-def sliceAt(string, slicePoint): return string[string.index(slicePoint)+len(slicePoint):]
-def joins(list): return "".join(list)
-def joins_(list): return " ".join(list)
-def splits(string): return string.split(" ")
-def ifNotNoneReturnIt(thing): return thing if thing else None
-def ifItemReturnIt(container,index): if len(container)>=index: return container[index]
-def ifKeyReturnValue(dictA, keyA): ## check if dict has key and return it
-	return dictA[keyA] if dictA[keyA] in isD.keys() else None
-ifKey(dict, keyA, keyB, keyC)
-def ifKeysReturnValue(*args): ## check if dict has key and return it
-	#key0 = args[0]; key1 = ifItemReturnIt(args,1)); key2 = ifItemReturnIt(args,2))
-	for x,key in args:
-	value0 = ifKeyReturnValue(dict0, key0)
-	if type(value0) == 'str' : return value0
-	if type(value0) == 'list': return value0
-	if type(value0) == 'dict': dictA = value0
-	value1 = ifKeyReturnValue(dictA, key1); 
-	if type(value1) == 'str' : return value1
-	if type(value1) == 'list': return value1
-	if type(value1) == 'dict': dictB = value1
-	value2 = ifKeyReturnValue(dictB, key2); 
-	if type(value2) == 'str' : return value2
-	if type(value2) == 'list': return value2
-	if type(value2) == 'dict': return value2
-	
-	#i = ifKeyReturnValue(ifKeyReturnValue(dictA, key1), key0); return i if i else None
-	# if ifItemReturnIt(args,0): return ifKeyReturnValue(dictA, ifItemReturnIt(args,0))
-	# if ifItemReturnIt(args,1): return ifKeyReturnValue(ifKeyReturnValue(dictA, ifItemReturnIt(args,0)), ifItemReturnIt(args,0))
-	# for x,i in enumerate(args): 
-		# return ifKeyReturnValue(dictA, ifItemReturnIt(args,i))
+def addQuotes(stringA): return "'"+stringA+"'"
+def sliceAt(stringA, slicePoint): return stringA[stringA.index(slicePoint)+len(slicePoint):]
+def joins(listA): return "".join(listA)
+def joins_(listA): return " ".join(listA)
+def splits(stringA): return stringA.split(" ")
+def printA(item): print item+":",eval(item)
+#def ifNotNoneReturnIt(thing): if thing: return thing;  else: return None
+def ifKeyNotNoneReturnIt(dictA,keyA): 
+	if keyA in dictA.keys(): return dictA[keyA]  
+	else: return None
+def ifItemReturnIt(container,index): return container[index] if len(container)>=index else None
+def ifKeyReturnValue(keyA, dictA): return ifKeyNotNoneReturnIt(dictA,keyA) ## check if dict has key and return it
+#def ifKeyReturnValue(keyA, dictA): return dictA[keyA] if dictA[keyA] in dictA.keys() else None ## check if dict has key and return it
+def ifKeyReturnValueD(keyA, dictA=isD): return ifKeyNotNoneReturnIt(dictA,keyA) ## check if dict has key and return it
+#def ifKeyReturnValueD(keyA, dictA=isD): return dictA[keyA] if dictA[keyA] in dictA.keys() else None ## check if dict has key and return it
+def ifKeysReturnValue(dict0=isD, *args): ## check if dict has key and return it
+	value = dict0
+	for key in args: 
+		value = ifKeyReturnValue(key,isD)#value); ##################
+		return value if not isinstance(value, dict) else None
 def returnDeepest(): 
 	if args[0] in isD.keys():
 		if len(args)>1 and args[1] in isD[args[0]].keys():
@@ -117,15 +107,15 @@ def saveD(dict1): json.dump(isD, dName)
 rememberD(isD)
 ## main
 def main(line):	
-	#global response; 
-	response = None
+	global tts;  global response; 
+	response = []
 	#if verbose: 
-	verbose = bool(ifKey("verbose",'noun','mydef'))
+	verbose = False #bool(ifKeysReturnValue("verbose",'noun','mydef')); print 1; printA('verbose'); print verbose
 	# if verbose == "False": verbose = False#True#
 	# if verbose == "True": verbose = True
-	tts = bool(ifKey("tts",'noun','mydef'))
+	tts = True#bool(ifKeysReturnValue("tts",'noun','mydef'))
 	#if isD["verbose"] == {'noun':"True"}:  verbose = True#
-	if verbose: print sys.platform; print isD; print 'tts:',tts
+	if verbose: print 'verbose', sys.platform; print isD; print 'tts:',tts
 ## remind verb/function definitions
 	noodle = remindNoodle()
 	global verbD; verbD = dictionaryNoodle(noodle); #print verbD
@@ -157,8 +147,8 @@ def main(line):
 	if not kw: print 'no keyword'
 	############ check/set for variable definition
 	## check for variables as keys
-	elif ifKey(line,'noun','mydef'): 
-		if verbose: print ifKey(line,'noun','mydef')
+	elif ifKeysReturnValue(line,'noun','mydef'): 
+		if verbose: print ifKeysReturnValue(line,'noun','mydef')
 		response=[isD[line]['noun']['mydef']]; #response.append(isD[line])
 		if response[0] == 'isD': print response; #response[0] = isD
 	## set variables as key and values
@@ -176,26 +166,14 @@ def main(line):
 		verbDefinitions = []
 		#[verbDefinitions.append([i]) if i == "," else verbDefinitions[-1].append(i) for i in verbDefinition]
 		verbDefinitions.append([verbDefinition])
-		if verbose: print verb,2,ifKey(verb)
-		if ifKey(verb): input = raw_input('do you want to add this verb?')
+		if verbose: print verb,2,ifKeyReturnValueD(verb)
+		if ifKeyReturnValueD(verb): input = raw_input('do you want to add "%s"?' % verb)
 		#if not ifKey(verb) or input == 'y': isD[verb] = {'verb': verbDefinitions}
-		if not ifKey(verb) or input == 'y': isD[verb] = {'verb': {'mydef':verbDefinitions}}#['verb']['mydef'] = verbDefinitions
+		if not ifKeyReturnValueD(verb) or input == 'y': isD[verb] = {'verb': {'mydef':verbDefinitions}}; print 'entered.. ',isD[verb]
 		if verbose: print 1,verbDefinition,2,verbDefinitions,3,isD[verb],4,verb
 	############ test verb definitions or instructions
-		''' trying to evaluate definition before adding but would need to run through 'think' function 
-		def addVerbDefintion(verb, verbDefinition):
-			verbDefinition[0] = verb2
-			if isD[verb2][0][0] == 'v': continue
-			else: print "I don't know how to: "+verb2 
-				verbDefined = verbDefinition[0]
-			print eval(verbDefined)
-			isD[verb] = verbDefined
-		addVerbDefintion(verbDefinition)
-		if verb in line: 
-			instructions = verbD[verb]; params = line[:line.index(verb)+1];
-			evaluate(instructions, params)
-		evaluate(lineList)'''
-	
+		#input = raw_input('do you want to test {%s}?' % verb)
+		#if input == 'y': print 'testing.. ',isD[verb]; exec(
 	############ check for conditionals
 	#if "if" in line: 
 	#if "but only if" in line: 
@@ -226,6 +204,7 @@ def main(line):
 	############ compute imperative statements - verb + args
 		#def computeImperative(verb, *args=None):
 		def computeImperative(imperativeList):
+			locals().update(globals())
 			global args#, response ######??
 			if verbose: print imperativeList  ########
 			
@@ -252,14 +231,16 @@ def main(line):
 					try: 
 						interpretation = string.join([verb+"("+args+")"],''); print 'interp:',interpretation 
 						exec(interpretation) in globals(), locals();  ################################### not secure
-						if tts: response = args; globals().update(locals())
+						if tts: response.append(args); globals().update(locals()); #print args; print 1345623,response
+						#if tts: response = args; globals().update(locals()); #print args; print 1345623,response
+						#if verbose: printA('response[0]')#print 'response',response
 					except Exception,e: 
 						print 'error exec Python verb: '+str(e)
 		## try execute definition with verb definitions and args 
 			if verb in isD.keys():
-				if type(isD[verb]['verb'][0]) is not list: print 'verb is not executable'
+				if type(isD[verb]['verb']['mydef'][0]) is not list: print 'verb is not executable'
 		## loop through definitions and execute with args
-				for index,definition in enumerate(isD[verb]['verb'][0]): 
+				for index,definition in enumerate(isD[verb]['verb']['mydef'][0]): 
 					if verbose: print index#,definition #############
 					if verbose: print '=definition:',definition ###########
 					try: 
@@ -273,78 +254,23 @@ def main(line):
 									
 	elif kw == 'quit': 
 		print 'noodle: ',noodle
-		print 'isD: ',isD #,json.dumps(isD, indent=4, sort_keys=True)
-		input = raw_input("save?")
-		if input == 'y': 
-			saveD(isD)
-		## store noodle	
-			# append(noodle); 
-		exit()
+		print 'isD: ',isD 
+		input = raw_input("save?"); saveD() if input == 'y' else None; exit()
 	elif kw not in isD.keys(): print "I don't know how to.. "+kw
 	else: print "I don't know what.. "+kw+" ..is"
 	#globals().update(locals())
 	if response:
-		for i in enumerate(response):
+		#print 1; printA('response')
+		for x,i in enumerate(response):
 			if not tts: print i 
 			if tts and response: print 'speaking.. ',i; exec(responseChannel) in locals(),globals() 
 			response = None
 			
-'''		
-def formatLine(line):
-	## parse line
-	if line.startswith("#"): return ## ignore comments
-	line = line.strip("\n").strip("\r").strip("\t"); # print line ## clean up line
-	#line = line.strip("\n").strip("\r"); print line ## clean up line, leave tabs
-	## find strings
-	global strings; strings = re.findall(r"\'(.+?)\'",line); #print strings 
-	for index,string in enumerate(strings): ## replace strings with list item
-		line = line.replace(line[line.index(string)-1:line.index(string)+len(string)+1], strings[index]) #print 2,strings[index]
-	return line 
-'''
-# def imperative(lineList):
-	#lineList = line.split(" "); 
-	#lineList = re.split('(\W+)', line); #print lineList
-	#kw = lineList[0]
-		# if verb == 'write': 
-			# for preposition in prepositions:
-				# if preposition in lineList:
-					##print 3,preposition
-					# prepositionIndex = lineList.index(preposition)
-					# object2 = lineList[prepositionIndex+1:]; print object2
-					# write(object1, preposition, " ".join(object2)); break
-			# write(" ".join(object1))
-		# if lineList[0] in functionD.keys():
-			# something = lineList[1:]
 			
-
-# def evaluate(instructionsL):
-	#instructionsL = instructions.split(", ")
-	# for instruction in instructionsL:
-		# for verb in verbsL:
-			# if verb in instructionsL: verb1 = verb
-		# for preposition in prepositions:
-			# if preposition in instructionsL: preposition1 = preposition;
-		# if preposition1: 
-			# object1 = instructionsL[instructionsL.index(verb1):instructionsL.index(preposition1)]
-			# object2 = instructionsL[instructionsL.index(preposition1):]
-		# else: object1 = instructionsL[instructionsL.index(verb1):]
-		# look up verb function, if includes another verb, look that up - recursive
-	
-	
-# def append(noodle):
-	# if functionD != verbD:
-		# for key,value in functionD.items():
-			# if functionD[key] not in verbD.keys():
-				# newInstruction = " ".join(['\n', key, value])
-				# with open("noodle.txt", 'ab') as file: file.write(newInstruction)
-			# elif verbD[key] != functionD[key]: print 'noodle line not the same'
-#def saveD(dict1):
-	# if isD != isD0:
-		# for key,value in isD.items():
-			# if isD[key] not in isD.keys():
-				# newInstruction = " ".join(['\n', key, value])
-	#with open("isD.json", 'wb') as file: file.write(newInstruction)
-			# elif verbD[key] != functionD[key]: print 'noodle line not the same'
+def saveD(dict1=isD):
+	with open("isD.json", 'wb+') as file: file.write(json.dumps(isD, indent=4, sort_keys=True))  ## w+ = wr and overwrite
+	#if verbose: pass
+	print json.dumps(dict1)
 	
 def write(sequence, preposition=False, object2=False):
 	fileName=''
