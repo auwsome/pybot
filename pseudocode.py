@@ -1,5 +1,8 @@
 # named as python file for editor functionality, commenting, etc.
 
+
+
+
 #write hello
 print 'hello'
 write 'hello'
@@ -39,6 +42,20 @@ shout 'hello'
 
 # search cheese
 
+# "print"		:{"verb": {"mydef": ["exec print(something)"]  }},
+# "write"		:{"verb": {"mydef": ["print something"]  }},
+# "speak"		:{"verb": {"mydef": ["exec engine.say(something);engine.runAndWait()"]  }},
+# "speak"		:{"verb": {"mydef": ["exec engine.say(something)"]  }},
+# "say"		:{"verb": {"mydef": ["print something", "speak something"]  }},
+# "shout"		:{"verb": {"mydef": ["write something","write '!!!'"], "otherdef": "yell"  }},    
+# "save"		:{"verb": {"mydef": ["exec 'saveD()'"]  }},
+# "responseChannel"		:{"noun": {"mydef": "engine.say(response); engine.runAndWait()"} }, 
+# "dict"		:{"noun": {"mydef": "isD"} }, 
+# "tts"		:{"noun": {"mydef": "True"} },
+# "verbose"	:{"noun": {"mydef": "True"} }
+
+to execute something, exec something 
+to print something, execute print(something) 
 
 to write something, print something 
 
