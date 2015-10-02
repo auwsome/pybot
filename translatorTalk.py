@@ -35,13 +35,13 @@ global verbose; verbose = True; global tts; tts = True
 ## wont exec args as is, args always parsed to something
 isD = {
 "write"		:{"verb": {"mydef": ["print something"]  }},
-"speak"		:{"verb": {"mydef": ["exec 'responseChannel'"]  }},
+"speak"		:{"verb": {"mydef": ["exec 'response = something'","exec 'responseChannel'"]  }},
 "say"		:{"verb": {"mydef": ["print something", "speak something"]  }},
 "shout"		:{"verb": {"mydef": ["write something","write '!!!'"], "otherdef": "yell"  }},    
 "save"		:{"verb": {"mydef": ["exec 'saveD()'"]  }},
 "dict"		:{"noun": {"mydef": "isD"} }, 
 "tts"		:{"noun": {"mydef": "True"} },
-"verbose"	:{"noun": {"mydef": "True"} }
+"verbose"	:{"noun": {"mydef": "False"} }
 }; isD0 = isD
 #isSD = re.sub("(\w+)", "'"+"\\1"+"'", isS); ## adds quotes around single words
 # a.setdefault("somekey",[]).append("bob")
@@ -60,7 +60,7 @@ def forItem(container,operation):
 	for item in container: exec(operation)
 #def ifNotNoneReturnIt(item): return item if item else None  ## only if checking item doesn't throw exception
 def ifVerbose(*args): return args if verbose else None 
-def printIfVerbose(stringOfItem): print ifVerbose(stringOfItem+"=",eval(stringOfItem))
+def printIfVerbose(stringOfItem): s = ifVerbose(stringOfItem+"=",eval(stringOfItem)); print s if s else "",
 def printV(*args): 
 	if args[0]: forItem(args,'printIfVerbose(item)')
 #verbose=True; a='b'; c='d'; printV('a','c')
@@ -113,13 +113,13 @@ global response; response = []; global args; args = None
 rememberD(isD)
 ############ main
 def main(line):	
-	printV('sys.platform','isD')
+	printV('sys.platform','isD'); print ""
 	global response ## puts global into locals
 	global verbose; global tts; 
 	#locals().update(globals()); 
 	#print 2,ifKeysReturnValue("verbose",'noun','mydef'); 
 	verbose = str2bool(isD['verbose']['noun']['mydef']); 
-	print verbose
+	#print verbose
 	tts = str2bool(isD['tts']['noun']['mydef'])#bool(ifKeysReturnValue("tts",'noun','mydef'))
 	#if isD["verbose"] == {'noun':"True"}:  verbose = True#
 	printV('response','verbose','tts','args')
@@ -207,7 +207,7 @@ def main(line):
 	elif kw in pythonVerbsL or (kw in isD.keys() and 'verb' in isD[kw].keys()): 
 		imperativeList = lineList
 		## parse args
-		if not args: print 23
+		#if not args: print 23
 		global args; ## puts local into globals?
 		args = parseArgs(imperativeList); 
 		if verbose: print 'args0:',args
@@ -226,9 +226,9 @@ def main(line):
 			#print locals()
 			#args = string.join(imperativeList[verbIndex+1:],''); #print 'args2: ',args
 		## parse args
-			print 1;printV('args') 
+			#print 1;printV('args') 
 			args = args if args else parseArgs(imperativeList); #
-			print 2;printV('args') 
+			#print 2;printV('args') 
 		## join verb and args
 			definition = string.join([verb, args],' '); #globals().update(locals()); 
 			#printV('verb','args','definition') 
@@ -239,9 +239,9 @@ def main(line):
 				input = 'y'# raw_input("try: "+definition+" ?")
 				if input == 'y':	
 					try: 
-						interpretation = string.join([verb+"("+args+")"],''); print 'interp:',interpretation 
+						interpretation = string.join([verb+"("+args+")"],''); print 'execString:',interpretation 
 						exec(interpretation) in globals(), locals();  ################################### not secure
-						if tts: response.append(args); globals().update(locals()); printV('args'); printV('response')
+						response.append(args); globals().update(locals()); printV('args'); printV('response')
 					except Exception,e: print 'myerror: exec pyverb: '+str(e)
 		## try execute definition with verb definitions and args 
 			if verb in isD.keys():
@@ -264,15 +264,12 @@ def main(line):
 		input = raw_input("save?"); saveD() if input == 'y' else None; exit()
 	elif kw not in isD.keys(): print "I don't know how to.. "+kw
 	else: print "I don't know what.. "+kw+" ..is"
-	printV('response')
 	#globals().update(locals())
 	if response:
-		print 10; printV('response')
 		for x,i in enumerate(response):
-			response = i; print response
-			if not tts: print response 
-			if tts and response: print 'speaking.. '+response; exec(responseChannel) in locals(),globals(); print responseChannel #droid.ttsSpeak(response)#			
-		response = [];#	response = []; print response;
+			response = i; print response; printV('response')
+			if tts: print 'speaking.. '; exec(responseChannel) in locals(),globals() 
+		response = []
 	return response
 			
 			
