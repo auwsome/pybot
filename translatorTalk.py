@@ -9,7 +9,7 @@ print "init translator"
 ## imports
 #import translated
 #import nltk
-import sys, re, json, operator, string
+import sys, re, json, operator, string, time
 try:
 	import pyttsx
 	#from Pybot import responseChannel, engine
