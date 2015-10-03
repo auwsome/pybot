@@ -163,14 +163,13 @@ def main(line):
 		# lineSplit = line.split("and").split("then")
 		# line[line.index()]
 		# for line in lineSplit:
-	#lineList = re.split('(\W+)', line); lineList = [i for i in lineList if i != " "] #print lineList ##########
-	lineList = re.split('(\W)', line); lineList = [i for i in lineList if i != ""]
+	lineList = re.split('(\W)', line); lineList = [i for i in lineList if i != ""] #lineList = re.split('(\W+)', line); 
 	if verbose: print '=lineList: ',lineList ########
 ##################### order of operations: check/set variables, check standard definitions, check conditionals (simple definitions), compute queries, compute imperatives 
 	#### evaluate words for known definitions ############################################
 	for index,item in enumerate(lineList):
 		if ifKeysReturnValueISD(item,'noun','mydef'): 
-			item = ISD[item]['noun']['mydef']; lineList[index] = item; print 'replaced..',item
+			item = ISD[item]['noun']['mydef']; lineList[index] = item; print 'replaced..',item ###############
 			if verbose: print lineList[index] #global item; printV("item","args")
 	#### imperative, conditional or query must be indicated by first word
 	kw = lineList[0]; 
