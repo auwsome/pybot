@@ -34,18 +34,20 @@ global ISD; ISD = {}; global verbose; verbose = True; global tts; tts = True
 ## wont exec args as is, args always parsed to something   
 # "print"		:{"verb": {"mydef": ["s = eval(args0)","exec print(args0)"]  }},
 ISD = {
-"execute"				:{"verb": {"mydef": ["exec something"]  }},
-"exec"				:{"verb": {"mydef": ["exec args"]  }},
+"exec"		:{"verb": {"mydef": ["something"]  }},
+"execute"	:{"verb": {"mydef": ["something"]  }},
+"if"		:{"verb": {"mydef": ["something"]  }},
 #"exec something"	:{"verb": {"mydef": ["exec"]  }},
-"print"		:{"verb": {"mydef": ["exec print(something)"]  }},
+"print"		:{"verb": {"mydef": ["print(something)"]  }},
 "write"		:{"verb": {"mydef": ["print something"]  }},
-"speak"		:{"verb": {"mydef": ["exec engine.say(something);engine.runAndWait()"]  }},
-"speak"		:{"verb": {"mydef": ["exec engine.say(something)"]  }},
+#"speak"	:{"verb": {"mydef": ["engine.say(something);engine.runAndWait()"]  }},
+"speak"		:{"verb": {"mydef": ["engine.say(something)"]  }},
 "say"		:{"verb": {"mydef": ["print something", "speak something"]  }},
+"say2"		:{"verb": {"mydef": ["if not tts: print something", "if not tts: say something"]  }},
 "shout"		:{"verb": {"mydef": ["write something","write '!!!'"], "otherdef": "yell"  }},    
 "save"		:{"verb": {"mydef": ["exec 'saveD()'"]  }},
-"responseChannel"		:{"noun": {"mydef": "engine.say(response); engine.runAndWait()"} }, 
-"something"		:{"noun": {"mydef": "abc"} },
+"responseChannel"	:{"noun": {"mydef": "engine.say(response); engine.runAndWait()"} }, 
+"something"	:{"noun": {"mydef": "abc"} },
 "tts"		:{"noun": {"mydef": "True"} },
 "verbose"	:{"noun": {"mydef": "False"} }, #################
 "verbose"	:{"noun": {"mydef": "True"} }, #################
@@ -69,9 +71,10 @@ def tryExcept(tryA, exceptA):
 
 def forItem(container,operation): 
 	for item in container: exec(operation)
+def ifThenElse(if1,then1,else1): return then1 if if1 else else1
 def printIf(*args): operation = 'if item: print item'; forItem(args,operation) 
 def ifVerbose(*args): return args if verbose else None 
-def printIfVerbose(stringOfItem): s = ifVerbose(stringOfItem+"=",eval(stringOfItem)); print s if s else "",
+def printIfVerbose(stringOfItem): s = ifVerbose(stringOfItem+"=",eval(stringOfItem)); print str(s)+"\n" if s else "",
 def printV(*args): s = forItem(args,'printIfVerbose(item)') if args[0] else None; exec("eval('s')")
 print "init translator"
 #printV('ISD')
@@ -147,7 +150,7 @@ def main(line):
 	#print 'verbose',ifKeysReturnValueISD("verbose",'noun','mydef')
 	verbose = str2bool(ifKeysReturnValueISD("verbose",'noun','mydef'))#verbose = str2bool(ISD['verbose']['noun']['mydef']) 
 	tts = str2bool(ifKeysReturnValueISD("tts",'noun','mydef'))#tts = str2bool(ISD['tts']['noun']['mydef'])
-	printV('verbose','tts','response','args'); printq()
+	printV('verbose','tts','response','args'); #printq()
 #### remind verb/function definitions
 	noodle = remindNoodle()
 	global verbD; verbD = dictionaryNoodle(noodle); #printV('verbD')
@@ -170,7 +173,9 @@ def main(line):
 	#### evaluate words for known definitions ############################################
 	for index,item in enumerate(lineList):
 		if ifKeysReturnValueISD(item,'noun','mydef'): 
-			item = ISD[item]['noun']['mydef']; lineList[index] = item; print 'replaced..',item
+			item0 = item; item = ISD[item]['noun']['mydef']; 
+			if lineList[index-1] == "\\": continue
+			if item != 'something': lineList[index] = item; print 'replaced..',item0,'with',item
 			if verbose: print lineList[index] #global item; printV("item","args")
 	#### imperative, conditional or query must be indicated by first word
 	kw = lineList[0]; 
@@ -223,11 +228,12 @@ def main(line):
 		global args; global count; ## puts local into globals or makes variable global
 		imperativeList = lineList; count=0
 		#### parse args
-		args = sliceArgs(imperativeList)
-		if verbose: print 'args0:',; printV('args'); printl()
+		#args = sliceArgs(imperativeList)
+		args = string.join(imperativeList[2:],'')
+		if verbose: print 'args0:',; printV('args')#; printl()
 		#####################################
 		def computeImperative(imperativeList):
-			global args ## puts global into locals
+			global args; ## puts global into locals
 			global count; count=count+1;
 			if count > 7: exit()
 			#locals().update(globals()); printV('args'); 
@@ -239,48 +245,68 @@ def main(line):
 			if verbose: print('imperativeList:',imperativeList) #printV('imperativeList')
 		############ parse imperative statements - verb + args
 		######## sentence structure VO verb-object
-		#### parse verb
-			verb = imperativeList[0]; verbIndex = imperativeList.index(verb); printV('verb')
+		#### parse new verb
+			global verb; verb = imperativeList[0]; verbIndex = imperativeList.index(verb); printV('verb')
 		#### parse args
-			#printV('args')
-#"print"		:{"verb": {"mydef": ["exec args0"]  }},
-#s = "print 2"; print 4,s; main(s)
-			if args: 
 			#### copy original args
-				global args0; args0 = args; printV('args0')
+			##global args0; args0 = args; printV('args0')
 			#### evaluate args for known definitions
-				#global argsL; argsL = imperativeList[verbIndex+2:]; printV('argsL'); printq()
-				# for index,item in enumerate(argsL):
-					# if ifKeysReturnValueISD(item,'noun','mydef'): 
-						# item = ISD[item]['noun']['mydef']; argsL[index] = item; 
-						# if verbose: print argsL[index] #global item; printV("item","args")
-				#args = joins(argsL); printV('args')
+			##global argsL; argsL = imperativeList[verbIndex+2:]; #printV('argsL'); printq()
+			#ifThenElse(args, args = args, args = args0)
+			#if args: args = args 
+			#else: args = joins(argsL)
+			#else: args = args0
+			#printV('args')
+			## replace nouns
+			# for index,item in enumerate(imperativeList):
+				# if ifKeysReturnValueISD(item,'noun','mydef'): 
+					# item = ISD[item]['noun']['mydef']; argsL[index] = item; 
+					# if verbose: print argsL[index] #global item; printV("item","args")
+			#if args in ISD.keys() and 'noun' in ISD[args].keys(): args = ISD[args]['noun']['mydef']
 			'''EXECUTE'''
 		#### try ___EXECUTE///////\\\\\''''''|||*** definition with Python functions and args defined as string above or in definition
-			if verb == 'exec':
-				print '\n', 'exec', imperativeList
-				#args = sliceArgs(imperativeList)
-				args = string.join(imperativeList[2:],'')####################################################
-				print 'executing..'+args
-				try: 
-					interpretation = string.join([verb+"("+args+")"],''); print 'interpretation:',interpretation 
-					exec(args) in globals(), locals(); ### not secure(?)
-				except Exception,e: print '\n'+'myerror: exec: '+str(e)
 		#### try execute definition with verb definitions and args 
-			elif verb in ISD.keys(): 
-				checkIfList = 'verb is in list form' if not isinstance(ISD[verb]['verb']['mydef'],list) else None; printIf(checkIfList)
+			if verb in ISD.keys(): 
+				global verbDefinition; 
+				
+				if verb == 'if':
+					
+				
+				if isinstance(ISD[verb]['verb']['mydef'],list):
+				#### loop through verb definitions list and execute with original args
+					if len(ISD[verb]['verb']['mydef'])>1:
+						#args0 = args; ISD['args']['noun']['mydef'] = args0
+						#if lineList[index-1] == "\\": continue
+						#print 'temp dict defined..',args,'as',args
+						for index,definition in enumerate(ISD[verb]['verb']['mydef']): 
+							print '';print index; printV('definition') 
+							try: 
+								definitionL = definition.split(" "); 
+								if verbose: print 3,definitionL
+								computeImperative(definitionL)
+							except Exception,e: print 'myerror: verb: '+str(e)
+				#### else define and execute		
+					if len(ISD[verb]['verb']['mydef']) == 1:
+						verbDefinition = ISD[verb]['verb']['mydef'][0]
+					
+				printV('verbDefinition')
+				if 'something' in verbDefinition: 
+					verbDefinition = verbDefinition.replace("something",args)
+					print 'interpretation:%s' % verbDefinition
+					print 'interpretation:%s' % repr(verbDefinition)
+					print 'interpretation:%s' % repr(repr(verbDefinition))
+					# print '\n', 'exec', imperativeList
+					# args = sliceArgs(imperativeList)
+					# args = string.join(imperativeList[2:],'')####################################################
+				#if verb == 'exec':
+				print 'executing..',verbDefinition
+				try: 
+					#interpretation = string.join([verb+"("+args+")"],''); print 'interpretation:',interpretation 
+					exec(verbDefinition) in globals(), locals(); ### not secure(?)
+				except Exception,e: print '\n'+'myerror: exec: '+str(e)
+					# checkIfList = 'verb is in list form' if not isinstance(ISD[verb]['verb']['mydef'],list) else None; printIf(checkIfList)
 			#### join verb and args
-				definition = string.join([verb, args],' '); #globals().update(locals()); 
-				printV('verb','args','definition')
-			#### loop through verb definitions list and execute with original args
-				for index,definition in enumerate(ISD[verb]['verb']['mydef']): 
-					print '';print index; printV('definition') 
-					try: 
-						definitionL = definition.split(" "); 
-						if verbose: print 3,definitionL
-						if "=" in definition: pass
-						else: computeImperative(definitionL)
-					except Exception,e: print 'myerror: verb: '+str(e)
+				# definition = string.join([verb, args],' '); #globals().update(locals()); 
 		computeImperative(imperativeList)
 									
 	elif kw == 'quit': 
@@ -373,17 +399,27 @@ if __name__=="__main__":
 	#while line != 'q':
 	#response = 'hi'; exec(responseChannel); response = []; 
 	prompt = '>'
-	s = "exec print(1)"; print 1,s; main(s)
-	s = "something = print(1)"; print 2,s; main(s)
-	s = "execute something"; print 3,s; main(s)
-	s = "print 2"; print 4,s; main(s)
-	# s = "something = 'hello'"; print 1,s; main(s)
+	# s = "exec print(1)"; print 1,s; main(s)
+	# s = "variable1 = print(1)"; print 2,s; main(s)
+	# s = "execute variable1"; print 3,s; main(s)
+	# s = "print 2"; print 4,s; main(s)
+	
+	# s = "write 'hello'"; print 7,s; main(s)
+	# s = "speak 'hello'"; print 7,s; main(s)
+	s = "say 'hello'"; print 7,s; main(s)
+	s = "say2 'hello'"; print 7,s; main(s)
+	
+	# s = "something1 = 'hello'"; print 1,s; main(s)
+	# s = "print something1"; print 6,s; main(s)
+	# s = "write something1"; print 7,s; main(s)
+	# s = "speak something1"; print 7,s; main(s)
+	# s = "say something1"; print 7,s; main(s)
+	# s = "say2 something1"; print 7,s; main(s)
+	
 	# s = "exec print(something)"; print 2,s; main(s)
 	# s = "another = 'hey'"; print 3,s; main(s)
 	# s = "something1 = print(another)"; print 4,s; main(s)
 	# s = "exec something1"; print 5,s; main(s)
-	# s = "print 'hello'"; print 6,s; main(s)
-	# s = "print something"; print 7,s; main(s)
 	
 	#main("print hello")
 	while not line:
