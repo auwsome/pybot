@@ -7,25 +7,11 @@ ISD starting definition
 '''
 print "init translator"
 ## imports
-#import translated
-#import nltk
 import sys, re, json, operator, string
-#from pyDatalog import pyDatalog
-'''
-from textblob import TextBlob
-blob = TextBlob("write 'hello, how are you?' into a file")
-blob.tags'''
 
-
-## global variables
-#global pythonVerbsL; pythonVerbsString = 'print,exec,operator.add(something,b)'; pythonVerbsL = pythonVerbsString.split(","); print pythonVerbsL
-#global verbsL; verbsString = 'write,make,create'; verbsL = verbsString.split(","); #print verbs
-#global prepositions; prepositionsString = 'in ,into ,over '; prepositions = prepositionsString.split(",")
 global functionD; functionD = {}; #global pythonVerbsL; 
 global ISD; ISD = {}; global verbose; verbose = True; global tts; tts = True
 
-## wont exec args as is, args always parsed to something   
-# "print"		:{"verb": {"mydef": ["s = eval(args0)","exec print(args0)"]  }},
 ISD = {
 "execute"	:{"verb": {"mydef": ["exec something"]  }},
 "if"		:{"verb": {"mydef": ["something"]  }},
@@ -36,7 +22,7 @@ ISD = {
 "say"		:{"verb": {"mydef": ["print something", "speak something"]  }},
 "sayiftts"	:{"verb": {"mydef": ["if not tts: print something", "if tts: say something"]  }},
 "shout"		:{"verb": {"mydef": ["write something","write '!!!'"], "otherdef": "yell"  }},    
-"save"		:{"verb": {"mydef": ["exec 'saveD()'"]  }},
+"save"		:{"verb": {"mydef": ["exec saveD()"]  }},
 "dict"		:{"verb": {"mydef": ["say ISD"]  }},
 "responseChannel"	:{"noun": {"mydef": "engine.say(response)"} }, 
 #"responseChannel"	:{"noun": {"mydef": "engine.say(response); engine.runAndWait()"} }, 
@@ -47,22 +33,18 @@ ISD = {
 "verbose"	:{"noun": {"mydef": "True"} }, #################
 "dict"		:{"noun": {"mydef": "ISD"} }
 }; ISD0 = ISD
-#isSD = re.sub("(\w+)", "'"+"\\1"+"'", isS); ## adds quotes around single words
-# a.setdefault("somekey",[]).append("bob")
 
-## helper functions
+#### helper functions
 def sliceAt(stringA, slicePoint): return stringA[stringA.index(slicePoint)+len(slicePoint):]
 def joins(listA): return "".join(listA)
 def joins_(listA): return " ".join(listA)
 def splits(stringA): return stringA.split(" ")
-def enquote(item): return repr(item)#"'"+item+"'"#return "'%s'" % s1;return "'{}'".format(s1)
-#l=['a']; print 111,quote(l[0]); s=l[0];print eval('s')
+#def enquote(item): return repr(item)#"'"+item+"'"#return "'%s'" % s1;return "'{}'".format(s1)
 def tryExcept(tryA, exceptA):
 	try:
-		eval(tryA)
-	except Exception, e: eval(ExceptA)
+		exec(tryA)
+	except Exception, e: print 'exeception'; exec(exceptA)
 #def ifNotNoneReturnIt(item): return item if item else None  ## only if checking item doesn't throw exception
-
 def forItem(container,operation): 
 	for item in container: exec(operation)
 def ifThenElse(if1,then1,else1): return then1 if if1 else else1
@@ -81,40 +63,20 @@ def ifKeyNotNoneReturnIt(dictA,keyA):
 	else: return None
 def ifItemReturnIt(container,index): return container[index] if len(container)>=index else None
 def ifKeyReturnValue(keyA, dictA): return ifKeyNotNoneReturnIt(dictA,keyA) ## check if dict has key and return it
-#print ifKeyReturnValue('verbose', ISD)
 def ifKeyReturnValueISD(keyA, dictA=ISD): return ifKeyNotNoneReturnIt(dictA,keyA) ## check if dict has key and return it
-#print ifKeyReturnValueISD('verbose')
 def ifKeysReturnValueISD(*args): ## check if dict has key and return it
 	def recursion(args):
 		value = ISD
 		for key in args: value = ifKeyReturnValue(key,value); returned = value if not isinstance(value, dict) else recursion(value)
 		return returned
 	return recursion(args)
-##To get your call to work, you'll need to use dictionary unpacking like this: func(**{MyEnum.X.name: 1})		
-#print 111, ifKeysReturnValue('verbose','noun','mydef')
-# def ifKeysReturnValue(*args, **kwargs): ## check if dict has key and return it
-	##for key, value in kwargs.items(): print key, value
-	# def recursion(args):
-		# if isinstance(args[0],dict): value = args[0]; args = args[1:]; print value
-		# for key in args: value = ifKeyReturnValue(key,value); returned = value if not isinstance(value, dict) else recursion(value)
-		# return returned
-	# return recursion(args)
-# print 222, ifKeysReturnValue(ISD,'verbose','noun','mydef',d='ISD')
-
-
-def sliceArgs(listA): 
-	args = string.join(listA[2:],'')
-	if args in ISD.keys() and 'noun' in ISD[args].keys(): args = ISD[args]['noun']['mydef']
-	return args
 def str2bool(v): return v.lower() in ("yes", "true", "t", "1")
 	
-## initialization functions
+#### initialization functions
 def getFile(file): f = open(file,"rb"); return f.read(); f.close() 
 def writeFile(file): f = open(file,"wb"); return f.read(); f.close()
 def getFileLines(file): f = open(file,"rb"); return f.readlines(); f.close()
 def getInstructions(): return getFileLines("pseudocode.py")
-#if 'arm' in sys.platform: dName = '/storage/sdcard1/ISD.json'
-#else: 
 dName = "ISD.json"
 def rememberD(dict1): 
 	with open(dName) as json_file: dict1 = json.load(json_file) 
@@ -124,17 +86,11 @@ def dictionaryNoodle(noodle):
 	for line in noodle: 
 		if line.startswith("to"): verbDef = line[:line.index(",")]; functionString = line[line.index(",")+1:]; functionD[verbDef] = functionString
 	return functionD
-#return 1 if n <= 1 else n*f(f,n-1)
-# if sys.platform = '': is[write] = (v,)
 def saveD(dict1): json.dump(ISD, dName)
-# class Bunch(object):
-  # def __init__(self, adict):
-    # self.__dict__.update(adict)
-# x = Bunch(ISD); print x.write
 
 
 global response; response = []; global args; args = None
-rememberD(ISD)
+tryExcept('rememberD(ISD)','print 1')
 ############ main
 def main(line):	
 #### line format first for readlines from file
@@ -203,41 +159,29 @@ def main(line):
 		if not ifKeyReturnValueISD(verb) or input == 'y': ISD[verb] = {'verb': {'mydef':verbDefs}}; print 'entered.. ',verb,':=:',ISD[verb]
 		#d if verbose: print verb 1,verbDef,2,verbDefs,3,ISD[verb],4,verb
 	############ check for conditionals
-	elif kw == "if": 
+	elif kw == "if": pass
 		#if verbose: print line
 		#conditionalList = lineList[lineList.index('if'):lineList.index(', ')-1]; print conditionalList
 		#if verb in conditionalList:
-		if lineList[lineList.index('if')+1] == "I":
+		# if lineList[lineList.index('if')+1] == "I":
 		#conditionList = conditionalList.remove("if"); print conditionList
 		#if conditionList[0] == "I":
-			if conditionList[1] == "say":
-				command = joins(lineList[2:lineList.index(', ')-1])
-				instructionWhole = line[line.index(',')+1:]
-				if 'then' in instructionWhole: instructionWhole = instructionWhole.lstrip("then ")
-				verbD[command] = instructionWhole
+			# if conditionList[1] == "say":
+				# command = joins(lineList[2:lineList.index(', ')-1])
+				# instructionWhole = line[line.index(',')+1:]
+				# if 'then' in instructionWhole: instructionWhole = instructionWhole.lstrip("then ")
+				# verbD[command] = instructionWhole
 	############ check for ***QUERY***
 	elif kw == "what": pass
 		
 		
-		
 	#####################################
 	############ compute ***IMPERATIVE*** statements - verb + args
-	#elif kw in ISD.keys() and 'verb' in ISD[kw].keys() and 'mydef' in ISD[kw]['verb'].keys(): 
 	elif ifKeysReturnValueISD(kw,'verb','mydef'): 
 		imperativeList = lineList; count=0
-	### parse verb
-		# verb = kw
 	### parse original args
 		args0 = string.join(imperativeList[2:],'')
 		# if verbose: print 'args0:',; printV('args')
-	### replace variables, i.e. evaluate words for known definitions ############################################
-		# for index,item in enumerate(imperativeList):
-			# if ifKeysReturnValueISD(item,'noun','mydef'): 
-				# item0 = item; item = ISD[item]['noun']['mydef']; 
-				# if imperativeList[index-1] == "\\": continue
-				# if item != 'something': imperativeList[index] = item; print 'defined1..',item0,':with:',item
-				# if verbose: print imperativeList[index] #global item; printV("item","args")
-				
 	#####################################
 		def computeImperative(imperativeList):
 			def printv(stringA): 
@@ -248,7 +192,7 @@ def main(line):
 			global count; count=count+1; ## puts global into locals
 			if count > 7: exit()
 			global verb; global args;  global args0; #global definition; global verbDef;)
-		############ parse imperative statements - verb + args ## sentence structure VO verb-object
+		############ parse imperative statements - verb + args.. sentence structure VO verb-object
 			if verbose: print('imperativeList:',imperativeList) #printV('imperativeList')
 		#### parse verb
 			verb = imperativeList[0]; verbIndex = imperativeList.index(verb); printV('verb')
@@ -310,8 +254,6 @@ def main(line):
 					return
 		computeImperative(imperativeList)
 	#####################################
-						
-
 		
 	elif kw == 'quit': 
 		print 'noodle: ',noodle
@@ -319,18 +261,12 @@ def main(line):
 		input = raw_input("save?"); saveD() if input == 'y' else None; exit()
 	elif kw not in ISD.keys(): print "I don't know how to.. "+kw
 	else: print "I don't know what.. "+kw+" ..is"
-	#globals().update(locals())
-	# if response:
-		# for x,i in enumerate(response):
-			# response = i; print response; printV('response')
-			# if tts: print 'speaking.. '; exec(responseChannel) in locals(),globals() 
-		# response = []
 	printl()
 	return response
 			
-			
 def saveD(dict1=ISD):
-	with open("ISD.json", 'wb+') as file: file.write(json.dumps(ISD, indent=4, sort_keys=True))  ## w+ = wr and overwrite
+	d = json.dumps(ISD, indent=4, sort_keys=True)
+	with open("ISD.json", 'wb+') as file: file.write(d)  ## w+ = wr and overwrite
 	#if verbose: pass
 	print json.dumps(dict1)
 	
@@ -413,6 +349,60 @@ if __name__=="__main__":
 		exec(channel)
 		if input is None: time.sleep(7); print 'input is None';
 		else: line = main(input)
+
+		
+		
+		
+		
+#import translated
+#import nltk
+#from pyDatalog import pyDatalog
+
+'''
+from textblob import TextBlob
+blob = TextBlob("write 'hello, how are you?' into a file")
+blob.tags'''	
+
+## global variables
+#global pythonVerbsL; pythonVerbsString = 'print,exec,operator.add(something,b)'; pythonVerbsL = pythonVerbsString.split(","); print pythonVerbsL
+#global verbsL; verbsString = 'write,make,create'; verbsL = verbsString.split(","); #print verbs
+#global prepositions; prepositionsString = 'in ,into ,over '; prepositions = prepositionsString.split(",")	
+
+# def sliceArgs(listA): 
+	# args = string.join(listA[2:],'')
+	# if args in ISD.keys() and 'noun' in ISD[args].keys(): args = ISD[args]['noun']['mydef']
+	# return args
+
+#isSD = re.sub("(\w+)", "'"+"\\1"+"'", isS); ## adds quotes around single words
+# a.setdefault("somekey",[]).append("bob")
+
+##To get your call to work, you'll need to use dictionary unpacking like this: func(**{MyEnum.X.name: 1})		
+#print 111, ifKeysReturnValue('verbose','noun','mydef')
+# def ifKeysReturnValue(*args, **kwargs): ## check if dict has key and return it
+	##for key, value in kwargs.items(): print key, value
+	# def recursion(args):
+		# if isinstance(args[0],dict): value = args[0]; args = args[1:]; print value
+		# for key in args: value = ifKeyReturnValue(key,value); returned = value if not isinstance(value, dict) else recursion(value)
+		# return returned
+	# return recursion(args)
+# print 222, ifKeysReturnValue(ISD,'verbose','noun','mydef',d='ISD')
+
+# class Bunch(object):
+  # def __init__(self, adict):
+    # self.__dict__.update(adict)
+# x = Bunch(ISD); print x.write
+
+#return 1 if n <= 1 else n*f(f,n-1)
+# if sys.platform = '': is[write] = (v,)
+
+	#globals().update(locals())
+	# if response:
+		# for x,i in enumerate(response):
+			# response = i; print response; printV('response')
+			# if tts: print 'speaking.. '; exec(responseChannel) in locals(),globals() 
+		# response = []
+
+
 	
 '''
 

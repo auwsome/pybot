@@ -1,65 +1,96 @@
 {
+    "a1": {
+        "noun": {
+            "mydef": "2 "
+        }
+    }, 
     "dict": {
         "noun": {
-            "mydef": "isD"
+            "mydef": "ISD"
         }
     }, 
-    "result": {
+    "end": {
         "verb": {
             "mydef": [
-                [
-                    "result something"
-                ], 
-                ""
+                "execute sys.exit() "
             ]
         }
     }, 
-    "return": {
+    "execute": {
         "verb": {
             "mydef": [
-                [
-                    "return something"
-                ], 
-                ""
+                "exec something"
             ]
+        }
+    }, 
+    "if": {
+        "verb": {
+            "mydef": [
+                "something"
+            ]
+        }
+    }, 
+    "print": {
+        "verb": {
+            "mydef": [
+                "exec print(something)"
+            ]
+        }
+    }, 
+    "responseChannel": {
+        "noun": {
+            "mydef": "engine.say(response)"
         }
     }, 
     "save": {
         "verb": {
             "mydef": [
-                [
-                    "exec 'saveD()'"
-                ]
+                "exec saveD()"
             ]
         }
     }, 
     "say": {
         "verb": {
             "mydef": [
-                [
-                    "write something"
-                ]
+                "print something", 
+                "speak something"
             ]
         }
     }, 
-    "say hi": {
+    "sayiftts": {
         "verb": {
             "mydef": [
-                [
-                    "say 'hi'"
-                ]
+                "if not tts: print something", 
+                "if tts: say something"
+            ]
+        }
+    }, 
+    "scrawl": {
+        "verb": {
+            "mydef": [
+                "print something"
             ]
         }
     }, 
     "shout": {
         "verb": {
             "mydef": [
-                [
-                    "write something", 
-                    "write '!!!'"
-                ], 
-                "yell"
+                "write something", 
+                "write '!!!'"
+            ], 
+            "otherdef": "yell"
+        }
+    }, 
+    "speak": {
+        "verb": {
+            "mydef": [
+                "exec engine.say(something);engine.runAndWait()"
             ]
+        }
+    }, 
+    "str1": {
+        "noun": {
+            "mydef": "'abc'"
         }
     }, 
     "tts": {
@@ -75,10 +106,7 @@
     "write": {
         "verb": {
             "mydef": [
-                [
-                    "print something"
-                ], 
-                "scrawl"
+                "print something"
             ]
         }
     }

@@ -41,7 +41,7 @@ say 'hello'
 to end, execute sys.exit() 
 # end
 
-save
+#save
 
 # another = 'hey'
 # something1 = print(another)
