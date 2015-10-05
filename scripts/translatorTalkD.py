@@ -19,7 +19,7 @@ ISD = {
 "print"		:{"verb": {"mydef": ["exec print(something)"]  }},
 "write"		:{"verb": {"mydef": ["print something"]  }},
 "scrawl"	:{"verb": {"mydef": ["print something"]  }},
-"speak"		:{"verb": {"mydef": ["exec engine.say(something);engine.runAndWait()"]  }},
+"speak"		:{"verb": {"mydef": ["response = something","exec(responseChannel)"]  }},
 "say"		:{"verb": {"mydef": ["print something", "speak something"]  }},
 "sayiftts"	:{"verb": {"mydef": ["if not tts: print something", "if tts: say something"]  }},
 "shout"		:{"verb": {"mydef": ["write something","write '!!!'"], "otherdef": "yell"  }},    
@@ -90,7 +90,7 @@ def dictionaryNoodle(noodle):
 def saveD(dict1): json.dump(ISD, dName)
 
 
-global response; response = []; global args; args = None
+global response; response = []; global args; args = None; global responseChannel
 tryExcept('rememberD(ISD)','print 1')
 ############ main
 def main(line):	
@@ -113,8 +113,8 @@ def main(line):
 	global args; global args0; global count; ## puts local into globals or makes variable global
 	args = ''; args0 = ''
 #### remind verb/function definitions
-	noodle = remindNoodle()
-	global verbD; verbD = dictionaryNoodle(noodle); #printV('verbD')
+	#noodle = remindNoodle()
+	#global verbD; verbD = dictionaryNoodle(noodle); #printV('verbD')
 	#global ISD; #ISD = remindNoodleJ(); 
 	#if line and verbose: print 'line=:',line ############
 	s = "print 'line=:',line" if line else None; eval('s')
@@ -342,15 +342,14 @@ if __name__=="__main__":
 		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
 		channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
 		channel = "input = raw_input(prompt)"
-		args = droid.getIntent().result[u'extras']
-		print args
+		args = droid.getIntent().result[u'extras']; print args
 		try: 
 			if args: input = args['%avcomm']; print input
 		except: pass
 		responseChannel = 'droid.ttsSpeak(response);exec("while droid.ttsIsSpeaking().result: pass")'
 		#storageFile = realcwd+'/PybotLines.py'
 ## do input from instructions
-	inputList = getInstructions(); #print input
+	#inputList = getInstructions(); #print input
 	# for index,line in enumerate(inputList):
 		# main(line)
 ## do input from user
