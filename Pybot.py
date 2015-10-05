@@ -13,9 +13,9 @@ except ImportError,e: print str(e)
 global tts
 
 #### vars
-global realcwd; realcwd = os.path.dirname(os.path.realpath(__file__))
+global filedir; filedir = os.path.dirname(os.path.realpath(__file__))
 global cwd; cwd = os.getcwd()
-print 'path= ',realcwd
+print 'path= ',filedir
 global dctn; dctn={'is':'equals', 'thing':'something', 'quit':'end loop', 'how':'thing', '?':'question mark', ' ':'space'}
 global commands; commands = []
 global input; input = "hi"
@@ -48,8 +48,8 @@ print sys.platform
 if sys.platform == 'win32': 
 	from bs4 import BeautifulSoup
 	#import bs4 as BeautifulSoup
-	dictName = realcwd+'\dict.json'
-	cmdsName = realcwd+'\commands.json'
+	dictName = filedir+'\dict.json'
+	cmdsName = filedir+'\commands.json'
 	prompt='p>'
 	tts = True
 	channel = "input = raw_input(prompt)"
@@ -75,7 +75,7 @@ if 'arm' in sys.platform:# == 'linux-armv71':
 		if args: input = args['%avcomm']; print input
 	except: pass
 	responseChannel = 'droid.ttsSpeak(response);exec("while droid.ttsIsSpeaking().result: pass")'
-	storageFile = realcwd+'/PybotLines.py'
+	storageFile = filedir+'/PybotLines.py'
 #if os.name == 'posix': 
 #### server, ie Cortana
 if serverCheck==1:
@@ -541,7 +541,7 @@ def getFilesRemote(url=None):
 		# print response.getcode()
 		# print response.headers.getheader('content-type')
 		page = response.read()
-		outfile = os.path.join(realcwd,url)
+		outfile = os.path.join(filedir,url)
 		with open(outfile, 'w') as file:
 			file.write(page)
 		print outfile

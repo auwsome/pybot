@@ -8,6 +8,7 @@ ISD starting definition
 print "init translator"
 ## imports
 import sys, re, json, operator, string
+#print("%x" % sys.maxsize, sys.maxsize > 2**32) ## 32 or 64 bit
 
 global functionD; functionD = {}; #global pythonVerbsL; 
 global ISD; ISD = {}; global verbose; verbose = True; global tts; tts = True
@@ -210,13 +211,13 @@ def main(line):
 		#### try execute if verb = exec
 			if verb == 'exec':
 			#### execute if definition is not recursive
-				print 'executing..',args
+				execArgs = args; print 'executing..',execArgs
 				try: 
-					exec(args) in globals(), locals(); ### not secure(?)
+					exec(execArgs) in globals(), locals(); ### not secure(?)
 				except NameError, exception: 
-					args = repr(args); print 'trying..', args
+					execArgs = repr(execArgs); print 'trying..', execArgs
 					try: 
-						exec(args) in globals(), locals(); ### not secure(?)
+						exec(execArgs) in globals(), locals(); ### not secure(?)
 					except Exception,exception: print 'myerror: exec2: '+str(exception)
 				except Exception, exception: print 'myerror: myexec: '+str(exception)
 				return
@@ -234,6 +235,8 @@ def main(line):
 					verbDef = ISD[verb]['verb']['mydef'][0]; print 'verbDef:', verbDef #printvv('verbDef')
 				#### replace 'something' in definitions
 					if 'something' in verbDef: 
+						if verb in ['print','write','speak','say']: 
+							if not args[0] in ["'",'"']: args = repr(args)
 						verbDef = verbDef.replace("something",args); print 'replaced verbDef "something" with', args
 				#### recurse if definition is recursive
 					print 'recurse'; verbDefL = re.split('(\W)', verbDef); 
@@ -293,7 +296,18 @@ def write(sequence, preposition=False, object2=False):
 	
 # check __main__ to run functions now that defined in any order above
 if __name__=="__main__":
-	######## check and set environment
+######## check for command line args
+	input = None
+	print sys.argv
+	if sys.argv[1:]:
+		try: 
+			args = sys.argv[1:]
+			if args: cmdline=1
+			print args
+			input = " ".join(args)
+			print input, sys.argv[0:], len(sys.argv)
+		except Exception,e: print str(e)
+######## check and set environment
 	print sys.platform
 	#### win32+'>')"
 	# btw, command line needs to have prefix running script with 'python'
@@ -324,6 +338,7 @@ if __name__=="__main__":
 		#from bs4 import BeautifulSoup
 		droid = android.Android(); d = droid
 		tts = True
+		prompt = ''
 		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
 		channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
 		channel = "input = raw_input(prompt)"
@@ -336,19 +351,19 @@ if __name__=="__main__":
 		#storageFile = realcwd+'/PybotLines.py'
 ## do input from instructions
 	inputList = getInstructions(); #print input
-	for index,line in enumerate(inputList):
-		main(line)
+	# for index,line in enumerate(inputList):
+		# main(line)
 ## do input from user
 	line=None
 	#while line != 'q':
 	#response = 'hi'; exec(responseChannel); response = []; 
-	prompt = '>'
 	#main("say hello")
 	while not line:
 		#line = raw_input("?"); #print line
-		exec(channel)
+		if not input: exec(channel);
+		else: print 'input:',input
 		if input is None: time.sleep(7); print 'input is None';
-		else: line = main(input)
+		else: line = main(input); input = None
 
 		
 		
@@ -401,7 +416,6 @@ blob.tags'''
 			# response = i; print response; printV('response')
 			# if tts: print 'speaking.. '; exec(responseChannel) in locals(),globals() 
 		# response = []
-
 
 	
 '''
