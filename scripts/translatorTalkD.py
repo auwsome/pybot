@@ -13,27 +13,45 @@ import sys, re, json, operator, string
 global functionD; functionD = {}; #global pythonVerbsL; 
 global ISD; ISD = {}; global verbose; verbose = True; global tts; tts = True
 
+global aaa; aaa = 'engine.say(response); engine.runAndWait()'
 ISD = {
 "execute"	:{"verb": {"mydef": ["exec something"]  }},
 "if"		:{"verb": {"mydef": ["something"]  }},
 "print"		:{"verb": {"mydef": ["exec print(something)"]  }},
 "write"		:{"verb": {"mydef": ["print something"]  }},
 "scrawl"	:{"verb": {"mydef": ["print something"]  }},
-"speak"		:{"verb": {"mydef": ["response = something"]  }},
+#"speak"	:{"verb": {"mydef": ["print speaking.. something","exec engine.say(response)","response = []"]  }},
+"speak"	:{"verb": {"mydef": ["print speaking.. something","exec droid.ttsSpeak(response)","response = []"]  }},
+#responseChannel = 'droid.ttsSpeak(response);exec("while droid.ttsIsSpeaking().result: pass")'
+
+#"speak"		:{"verb": {"mydef": ["print speaking.. something","exec responseChannel","response = []"]  }},
+#"speak"		:{"verb": {"mydef": ["print speaking.. something","exec responseChannel","response = []"]  }},
 "say"		:{"verb": {"mydef": ["print something", "speak something"]  }},
 "sayiftts"	:{"verb": {"mydef": ["if not tts: print something", "if tts: say something"]  }},
 "shout"		:{"verb": {"mydef": ["write something","write '!!!'"], "otherdef": "yell"  }},    
 "save"		:{"verb": {"mydef": ["exec saveD()"]  }},
 "dict"		:{"verb": {"mydef": ["say ISD"]  }},
+#"speakifsys":{"verb": {"mydef": ["if sys_platform_win32: responseChannel = aaa","if sys_platform_arm: responseChannel = ''","print responseChannel","speak something"]  }},
+
 #"responseChannel"	:{"noun": {"mydef": "engine.say(response)"} }, 
 #"responseChannel"	:{"noun": {"mydef": "engine.say(response); engine.runAndWait()"} }, 
-"str1"	:{"noun": {"mydef": "'abc'"} },
 "tts"		:{"noun": {"mydef": "True"} },
 #"tts"		:{"noun": {"mydef": "False"} },
 "verbose"	:{"noun": {"mydef": "False"} }, #################
 "verbose"	:{"noun": {"mydef": "True"} }, #################
+"str1"		:{"noun": {"mydef": "'abc'"} },
+"string1"	:{"noun": {"mydef": "'abc'"} },
+"aString"	:{"noun": {"mydef": "'abc'"} },
+"response"	:{"noun": {"mydef": "'hi'"} },
 "dict"		:{"noun": {"mydef": "ISD"} }
 }; ISD0 = ISD
+
+instructionsS = '''
+if sys_platform == win32: 
+#speakifsys 'hello'
+speak 'hello'
+#say 'hello'
+'''
 
 #### helper functions
 def sliceAt(stringA, slicePoint): return stringA[stringA.index(slicePoint)+len(slicePoint):]
@@ -45,6 +63,10 @@ def tryExcept(tryA, exceptA):
 	try:
 		exec(tryA)
 	except Exception, e: print 'exeception'; exec(exceptA)
+def tryExceptPrint(tryA):
+	try:
+		exec(tryA)
+	except Exception, e: print 'exeception',e
 #def ifNotNoneReturnIt(item): return item if item else None  ## only if checking item doesn't throw exception
 def forItem(container,operation): 
 	for item in container: exec(operation)
@@ -76,8 +98,10 @@ def str2bool(v): return v.lower() in ("yes", "true", "t", "1")
 #### initialization functions
 def getFile(file): f = open(file,"rb"); return f.read(); f.close() 
 def writeFile(file): f = open(file,"wb"); return f.read(); f.close()
-def getFileLines(file): f = open(file,"rb"); return f.readlines(); f.close()
-def getInstructions(): return getFileLines("pseudocode.py")
+def getFileLines(file): tryExceptPrint('f = open(file,"rb"); return f.readlines(); f.close()')
+def getInstructions(): 
+	if getFileLines("pseudocode.py"): return getFileLines("pseudocode.py")
+	else: instructionsL = instructionsS.split("\n"); return instructionsL
 dName = "ISD.json"
 def rememberD(dict1): 
 	with open(dName) as json_file: dict1 = json.load(json_file) 
@@ -91,7 +115,7 @@ def saveD(dict1): json.dump(ISD, dName)
 
 
 global response; response = []; global args; args = None; global responseChannel
-tryExcept('rememberD(ISD)','print 1')
+tryExceptPrint('rememberD(ISD)')
 ############ main
 def main(line):	
 #### line format first for readlines from file
@@ -257,11 +281,6 @@ def main(line):
 					return
 		computeImperative(imperativeList)
 	#####################################
-		if response:
-		for x,i in enumerate(response):
-			response = i; print response; printV('response')
-			if tts: print 'speaking.. '; exec(responseChannel) in locals(),globals() 
-		response = []
 	
 		
 	elif kw == 'quit': 
@@ -318,32 +337,32 @@ if __name__=="__main__":
 	#### win32+'>')"
 	# btw, command line needs to have prefix running script with 'python'
 	if sys.platform == 'win32': 
-		#from bs4 import BeautifulSoup
-		#import bs4 as BeautifulSoup
-		# dictName = realcwd+'\dict.json'
-		# cmdsName = realcwd+'\commands.json'
-		prompt='>'
-		tts = True
-		channel = "engine.say(prompt); engine.runAndWait();input = raw_input(prompt)"
-		try:
-			import pyttsx
-		except ImportError,e: print str(e)
+		main('sys_platform_win32 = True')
+		main('sys_platform_arm = False')
+		tryS = 'try:\n\t'+'import pyttsx\n'+'except ImportError,e: print str(e)'; exec(tryS)
+		# try:
+			# import pyttsx
+		# except ImportError,e: print str(e)
+		#engine.say('test'); engine.runAndWait()
 		engine = pyttsx.init()
 		rate = engine.getProperty('rate')
 		engine.setProperty('rate', rate-25)
-		#engine.say('test'); engine.runAndWait()
+		
+		prompt='>'
+		channel = "engine.say(prompt); engine.runAndWait();input = raw_input(prompt)"
 		#if tts:	
-		responseChannel = 'engine.say(response); engine.runAndWait()'
-		storageFile = 'PybotLines.py'
+		#responseChannel = 'engine.say(response); engine.runAndWait()'
+		#storageFile = 'PybotLines.py'
+		#from bs4 import BeautifulSoup
+		#import bs4 as BeautifulSoup'
 	#### android
 	if 'arm' in sys.platform:# == 'linux-armv71': 
-		#dictName = '/storage/sdcard1/dict.json'
-		#cmdsName = '/storage/sdcard1/commands.json'
+		main('sys_platform_arm = True')
+		main('sys_platform_win32 = False')
 		import android 
 		#from BeautifulSoup import BeautifulSoup
 		#from bs4 import BeautifulSoup
 		droid = android.Android(); d = droid
-		tts = True
 		prompt = ''
 		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
 		channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
@@ -355,9 +374,9 @@ if __name__=="__main__":
 		responseChannel = 'droid.ttsSpeak(response);exec("while droid.ttsIsSpeaking().result: pass")'
 		#storageFile = realcwd+'/PybotLines.py'
 ## do input from instructions
-	#inputList = getInstructions(); #print input
-	# for index,line in enumerate(inputList):
-		# main(line)
+	inputList = getInstructions(); #print input
+	for index,line in enumerate(inputList):
+		main(line)
 ## do input from user
 	line=None
 	#while line != 'q':
@@ -374,14 +393,15 @@ if __name__=="__main__":
 		
 		
 		
-#import translated
-#import nltk
-#from pyDatalog import pyDatalog
 
 '''
 from textblob import TextBlob
 blob = TextBlob("write 'hello, how are you?' into a file")
 blob.tags'''	
+
+#import translated
+#import nltk
+#from pyDatalog import pyDatalog
 
 ## global variables
 #global pythonVerbsL; pythonVerbsString = 'print,exec,operator.add(something,b)'; pythonVerbsL = pythonVerbsString.split(","); print pythonVerbsL
