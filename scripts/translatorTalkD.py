@@ -40,7 +40,7 @@ ISD = {
 "tts"		:{"noun": {"mydef": "True"} },
 #"tts"		:{"noun": {"mydef": "False"} },
 "verbose"	:{"noun": {"mydef": "False"} }, #################
-"verbose"	:{"noun": {"mydef": "True"} }, #################
+#"verbose"	:{"noun": {"mydef": "True"} }, #################
 "str1"		:{"noun": {"mydef": "'abc'"} },
 "string1"	:{"noun": {"mydef": "'abc'"} },
 "aString"	:{"noun": {"mydef": "'abc'"} },
@@ -49,7 +49,7 @@ ISD = {
 }; ISD0 = ISD
 
 instructionsS = '''
-string1
+# string1
 # print 1
 #if sys_platform == win32: 
 #speakifsys 'hello'
