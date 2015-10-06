@@ -178,8 +178,7 @@ def main(line):
 	############ try to execute	
 	try: 
 		if verbose: print 'trying as is..',line
-		response = str(eval(line));droid.ttsSpeak("yes?"); droid.ttsSpeak(response); 
-		exec(responseChannel) in globals(), locals(); 
+		response = str(eval(line)); exec(responseChannel) in globals(), locals(); 
 		#exec(line) in globals(), locals(); print '\n'; 
 		return
 	except Exception, exception: 
@@ -382,14 +381,12 @@ if __name__=="__main__":
 		#import bs4 as BeautifulSoup'
 	#### android
 	if 'arm' in sys.platform:# == 'linux-armv71': 
-		print 'arm'
 		# main('sys_platform_arm = True')
 		# main('sys_platform_win32 = False')
 		import android 
 		#from BeautifulSoup import BeautifulSoup
 		#from bs4 import BeautifulSoup
-		global droid; droid = android.Android(); d = droid
-		droid.ttsSpeak("yes?")
+		droid = android.Android(); d = droid
 		prompt = ''
 		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
 		channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
@@ -418,7 +415,7 @@ if __name__=="__main__":
 		else: print 'input:',input
 		if input is None: time.sleep(7); print 'input is None';
 		else: 
-			main(input); input = None; droid.ttsSpeak("yes?")
+			main(input); input = None
 
 		
 		
