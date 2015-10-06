@@ -61,9 +61,24 @@ to beep, if sys_platform_win32: exec import winsound; winsound.Beep(2500,300)
 #Freq = 2500 Dur = 100 
 #to beep, if sys_platform_win32: exec import winsound; winsound.Beep(2500,300)
 beep
-# save
+# save 
+## android ##
 to vibrate, if sys_platform_arm: exec droid.vibrate()
 vibrate
+# to make toast, if sys_platform_arm: exec droid.makeToast()
+to toast something, if sys_platform_arm: exec droid.makeToast(something)
+toast 'hi'
+to notify, if sys_platform_arm: exec droid.notify('notify',something)
+notify 'hi'
+
+packagename = 'com.chrome.android'
+classname = 'com.chrome.android.StartActivity'
+# classname = None
+to start, if sys_platform_arm: exec droid.startActivity('android.intent.action.MAIN', None, None, None, False, packagename, classname)
+start
+
+to getInput, if sys_platform_arm: exec droid.getInput()
+getInput
 #save
 # string1
 # print 1
