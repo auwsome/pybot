@@ -178,7 +178,7 @@ def main(line):
 	############ try to execute	
 	try: 
 		if verbose: print 'trying as is..',line
-		response = eval(line); exec(responseChannel) in globals(), locals(); 
+		response = str(eval(line)); exec(responseChannel) in globals(), locals(); 
 		#exec(line) in globals(), locals(); print '\n'; 
 		return
 	except Exception, exception: 
@@ -312,7 +312,7 @@ def main(line):
 	elif kw not in ISD.keys(): print "I don't know how to.. "+kw
 	else: print "I don't know what.. "+kw+" ..is"
 	printl()
-	return response
+	#return response
 			
 def saveD(dict1=ISD):
 	d = json.dumps(ISD, indent=4, sort_keys=True)
