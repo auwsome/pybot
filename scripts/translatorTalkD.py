@@ -167,7 +167,7 @@ def main(line):
 	#### check for variables as keys
 	if ifKeysReturnValueISD(line,'noun','mydef'): 
 		if verbose: print ifKeysReturnValueISD(line,'noun','mydef')
-		response=[ISD[line]['noun']['mydef']]; exec(responseChannel) in globals(), locals(); return 
+		response = ISD[line]['noun']['mydef']; exec(responseChannel) in globals(), locals(); return 
 	#### set variables as key and value
 	if 'is' in lineList: 
 		var = joins(lineList[:lineList.index('is')-1]); assignment = joins(lineList[lineList.index('is')+2:]); 
@@ -178,7 +178,7 @@ def main(line):
 	############ try to execute	
 	try: 
 		if verbose: print 'trying as is..',line
-		response = str(eval(line)); exec(responseChannel) in globals(), locals(); 
+		response = str(eval(line)); print response; exec(responseChannel) in globals(), locals(); 
 		#exec(line) in globals(), locals(); print '\n'; 
 		return
 	except Exception, exception: 
