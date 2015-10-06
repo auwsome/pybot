@@ -34,6 +34,9 @@ ISD = {
 "dict"		:{"verb": {"mydef": ["say ISD"]  }},
 #"speakifsys":{"verb": {"mydef": ["if sys_platform_win32: responseChannel = aaa","if sys_platform_arm: responseChannel = ''","print responseChannel","speak something"]  }},
 
+"dict"		:{"verb": {"mydef": ["say ISD"]  }},
+
+
 #"responseChannel"	:{"noun": {"mydef": "engine.say(response)"} }, 
 #"responseChannel"	:{"noun": {"mydef": "engine.say(response); engine.runAndWait()"} }, 
 "quit"		:{"noun": {"mydef": "False"} },
@@ -50,6 +53,15 @@ ISD = {
 }; ISD0 = ISD
 
 instructionsS = '''
+#sayiftts 'hi'
+to beep, if sys_platform_win32: exec import winsound; winsound.Beep(2500,300) 
+#Freq = 2500 Dur = 100 
+#to beep, if sys_platform_win32: exec import winsound; winsound.Beep(2500,300)
+beep
+# save
+to vibrate, if sys_platform_arm: exec droid.vibrate()
+vibrate
+#save
 # string1
 # print 1
 #if sys_platform == win32: 
@@ -120,6 +132,10 @@ def dictionaryNoodle(noodle):
 		if line.startswith("to"): verbDef = line[:line.index(",")]; functionString = line[line.index(",")+1:]; functionD[verbDef] = functionString
 	return functionD
 def saveD(dict1): json.dump(ISD, dName)
+import importlib
+def import1(modulename): modulename = importlib.import_module(modulename)
+
+
 
 
 #global response; 
@@ -275,8 +291,8 @@ def main(line):
 					printv('single')
 				#### evaluate conditionals
 					if verb == 'if':
-						printv('if'); condition = joins(imperativeList[2:imperativeList.index(":")]); print 'condition:', condition, '..is..', eval(condition)
-						if eval(condition): definitionL = imperativeList[imperativeList.index(":")+2:]; print 'eval',definitionL; computeImperative(definitionL)
+						printv('if'); condition = joins(imperativeList[2:imperativeList.index(":")]); print 'condition:', repr(condition), '..is..', eval(condition)
+						if eval(condition): definitionL = imperativeList[imperativeList.index(":")+3:]; print 'eval',definitionL; computeImperative(definitionL); return
 						else: print 'not'; return
 				#### define..	
 					verbDef = ISD[verb]['verb']['mydef'][0]; print 'verbDef:', verbDef #printvv('verbDef')
@@ -287,7 +303,7 @@ def main(line):
 						verbDef = verbDef.replace("something",args); print 'replaced verbDef "something" with', args
 				#### recurse if definition is recursive
 					print 'recurse'; verbDefL = re.split('(\W)', verbDef); 
-					computeImperative(verbDefL); return response
+					computeImperative(verbDefL); return 
 			#### loop through multiple verb definitions and execute with original args
 				if len(ISD[verb]['verb']['mydef'])>1:
 					
@@ -360,6 +376,7 @@ if __name__=="__main__":
 	#### win32+'>')"
 	# btw, command line needs to have prefix running script with 'python'
 	if sys.platform == 'win32': 
+		ISD['sys_platform_win32'] = {'noun':{'mydef':'True'}}
 		# main('sys_platform_win32 = True')
 		# main('sys_platform_arm = False')
 		#tryS = 'try:\n\t'+'import pyttsx\n'+'except ImportError,e: print str(e)'; exec(tryS)
@@ -382,6 +399,7 @@ if __name__=="__main__":
 		#import bs4 as BeautifulSoup'
 	#### android
 	if 'arm' in sys.platform:# == 'linux-armv71': 
+		ISD['sys_platform_arm'] = {'noun':{'mydef':'True'}}
 		# main('sys_platform_arm = True')
 		# main('sys_platform_win32 = False')
 		import android 
