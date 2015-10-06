@@ -382,12 +382,14 @@ if __name__=="__main__":
 		#import bs4 as BeautifulSoup'
 	#### android
 	if 'arm' in sys.platform:# == 'linux-armv71': 
+		print 'arm'
 		# main('sys_platform_arm = True')
 		# main('sys_platform_win32 = False')
 		import android 
 		#from BeautifulSoup import BeautifulSoup
 		#from bs4 import BeautifulSoup
 		global droid; droid = android.Android(); d = droid
+		droid.ttsSpeak("yes?")
 		prompt = ''
 		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
 		channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
@@ -416,7 +418,7 @@ if __name__=="__main__":
 		else: print 'input:',input
 		if input is None: time.sleep(7); print 'input is None';
 		else: 
-			main(input); input = None
+			main(input); input = None; droid.ttsSpeak("yes?")
 
 		
 		
