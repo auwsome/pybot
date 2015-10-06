@@ -19,7 +19,8 @@ ISD = {
 "print"		:{"verb": {"mydef": ["exec print(something)"]  }},
 "write"		:{"verb": {"mydef": ["print something"]  }},
 "scrawl"	:{"verb": {"mydef": ["print something"]  }},
-"speak"		:{"verb": {"mydef": ["exec engine.say(something);engine.runAndWait()"]  }},
+#"speak"		:{"verb": {"mydef": ["exec engine.say(something);engine.runAndWait()"]  }},
+"speak"		:{"verb": {"mydef": ["response = something"]  }},
 "say"		:{"verb": {"mydef": ["print something", "speak something"]  }},
 "sayiftts"	:{"verb": {"mydef": ["if not tts: print something", "if tts: say something"]  }},
 "shout"		:{"verb": {"mydef": ["write something","write '!!!'"], "otherdef": "yell"  }},    
@@ -257,6 +258,12 @@ def main(line):
 					return
 		computeImperative(imperativeList)
 	#####################################
+		if response:
+		for x,i in enumerate(response):
+			response = i; print response; printV('response')
+			if tts: print 'speaking.. '; exec(responseChannel) in locals(),globals() 
+		response = []
+	
 		
 	elif kw == 'quit': 
 		print 'noodle: ',noodle
@@ -411,11 +418,7 @@ blob.tags'''
 # if sys.platform = '': is[write] = (v,)
 
 	#globals().update(locals())
-	# if response:
-		# for x,i in enumerate(response):
-			# response = i; print response; printV('response')
-			# if tts: print 'speaking.. '; exec(responseChannel) in locals(),globals() 
-		# response = []
+
 
 	
 '''
