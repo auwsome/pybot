@@ -257,6 +257,12 @@ def main(line):
 					return
 		computeImperative(imperativeList)
 	#####################################
+		if response:
+		for x,i in enumerate(response):
+			response = i; print response; printV('response')
+			if tts: print 'speaking.. '; exec(responseChannel) in locals(),globals() 
+		response = []
+	
 		
 	elif kw == 'quit': 
 		print 'noodle: ',noodle
