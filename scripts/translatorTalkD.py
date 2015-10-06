@@ -64,21 +64,21 @@ beep
 # save 
 ## android ##
 to vibrate, if sys_platform_arm: exec droid.vibrate()
-vibrate
+#vibrate
 # to make toast, if sys_platform_arm: exec droid.makeToast()
-to toast something, if sys_platform_arm: exec droid.makeToast(something)
-toast 'hi'
-to notify, if sys_platform_arm: exec droid.notify('notify',something)
-notify 'hi'
+#to toast something, if sys_platform_arm: exec droid.makeToast(something)
+#toast 'hi'
+#to notify, if sys_platform_arm: exec droid.notify('notify',something)
+#notify 'hi'
 
-packagename = 'com.chrome.android'
-classname = 'com.chrome.android.StartActivity'
+#packagename = 'com.chrome.android'
+#classname = 'com.chrome.android.StartActivity'
 # classname = None
-to start, if sys_platform_arm: exec droid.startActivity('android.intent.action.MAIN', None, None, None, False, packagename, classname)
-start
+#to start, if sys_platform_arm: exec droid.startActivity('android.intent.action.MAIN', None, None, None, False, packagename, classname)
+#start
 
-to getInput, if sys_platform_arm: exec droid.getInput()
-getInput
+#to getInput, if sys_platform_arm: exec droid.getInput()
+#getInput
 #save
 # string1
 # print 1
@@ -206,10 +206,10 @@ def main(line):
 	#### set variables as key and value
 	if 'is' in lineList: 
 		var = joins(lineList[:lineList.index('is')-1]); assignment = joins(lineList[lineList.index('is')+2:]); 
-		print 'defining..,',var,"is",assignment; ISD[var] = {'noun':{'mydef':assignment}}; print ISD[var]; print(ISD); printl(); return 
+		print 'defining..,',var,"is",assignment; ISD[var] = {'noun':{'mydef':assignment}}; print ISD[var]; return 
 	if '=' in lineList: 
 		var = joins(lineList[:lineList.index('=')-1]); assignment = joins(lineList[lineList.index('=')+2:]); 
-		print 'defining..,',var,"=" ,assignment; ISD[var] = {'noun':{'mydef':assignment}}; print ISD[var]; print(ISD); printl(); return 
+		print 'defining..,',var,"=" ,assignment; ISD[var] = {'noun':{'mydef':assignment}}; print ISD[var]; return 
 	############ try to execute	
 	try: 
 		if verbose: print 'trying as is..',line
@@ -335,7 +335,9 @@ def main(line):
 						try: 
 							computeImperative(verbDefL); 
 						except Exception,e: print 'myerror: multiple '+str(e)
+						
 					return response
+			
 		computeImperative(imperativeList)
 	#####################################
 	
@@ -348,6 +350,7 @@ def main(line):
 	else: print "I don't know what.. "+kw+" ..is"
 	printl()
 	#return response
+	return None
 			
 def saveD(dict1=ISD):
 	d = json.dumps(ISD, indent=4, sort_keys=True)
@@ -440,11 +443,11 @@ if __name__=="__main__":
 	for index,line in enumerate(inputList):
 		main(line)
 ## do input from user
-	line=None
+	result=None
 	#while line != 'q':
 	#response = 'hi'; exec(responseChannel); response = []; 
 	#main("say hello")
-	while True:#not quit:
+	while result:
 		#line = raw_input("?"); #print line
 		quit = str2bool(ifKeysReturnValueISD("quit",'noun','mydef'))
 		tts = str2bool(ifKeysReturnValueISD("tts",'noun','mydef'))
@@ -452,7 +455,7 @@ if __name__=="__main__":
 		else: print 'input:',input
 		if input is None: time.sleep(7); print 'input is None';
 		else: 
-			main(input); input = None
+			result = main(input); input = None
 
 		
 		
