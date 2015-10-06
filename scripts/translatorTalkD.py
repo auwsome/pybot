@@ -178,7 +178,8 @@ def main(line):
 	############ try to execute	
 	try: 
 		if verbose: print 'trying as is..',line
-		response = str(eval(line)); droid.ttsSpeak(response); exec(responseChannel) in globals(), locals(); 
+		response = str(eval(line));droid.ttsSpeak("yes?"); droid.ttsSpeak(response); 
+		exec(responseChannel) in globals(), locals(); 
 		#exec(line) in globals(), locals(); print '\n'; 
 		return
 	except Exception, exception: 
@@ -386,7 +387,7 @@ if __name__=="__main__":
 		import android 
 		#from BeautifulSoup import BeautifulSoup
 		#from bs4 import BeautifulSoup
-		droid = android.Android(); d = droid
+		global droid; droid = android.Android(); d = droid
 		prompt = ''
 		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
 		channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
