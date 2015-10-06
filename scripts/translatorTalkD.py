@@ -40,6 +40,9 @@ ISD = {
 #"responseChannel"	:{"noun": {"mydef": "engine.say(response)"} }, 
 #"responseChannel"	:{"noun": {"mydef": "engine.say(response); engine.runAndWait()"} }, 
 "quit"		:{"noun": {"mydef": "False"} },
+"sys_platform_win32"	:{"noun": {"mydef": "False"} },
+"sys_platform_arm"		:{"noun": {"mydef": "False"} },
+"sys_platform_i686"		:{"noun": {"mydef": "False"} },
 "tts"		:{"noun": {"mydef": "True"} },
 #"tts"		:{"noun": {"mydef": "False"} },
 "verbose"	:{"noun": {"mydef": "False"} }, #################
@@ -132,8 +135,8 @@ def dictionaryNoodle(noodle):
 		if line.startswith("to"): verbDef = line[:line.index(",")]; functionString = line[line.index(",")+1:]; functionD[verbDef] = functionString
 	return functionD
 def saveD(dict1): json.dump(ISD, dName)
-import importlib
-def import1(modulename): modulename = importlib.import_module(modulename)
+#import importlib
+#def import1(modulename): modulename = importlib.import_module(modulename)
 
 
 
