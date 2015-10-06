@@ -44,6 +44,7 @@ ISD = {
 "str1"		:{"noun": {"mydef": "'abc'"} },
 "string1"	:{"noun": {"mydef": "'abc'"} },
 "aString"	:{"noun": {"mydef": "'abc'"} },
+"variable"	:{"noun": {"mydef": "'abc'"} },
 #"response"	:{"noun": {"mydef": "'hi'"} },
 "dict"		:{"noun": {"mydef": "ISD"} }
 }; ISD0 = ISD
