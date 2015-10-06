@@ -178,7 +178,7 @@ def main(line):
 	############ try to execute	
 	try: 
 		if verbose: print 'trying as is..',line
-		response = str(eval(line)); print response; exec(responseChannel) in globals(), locals(); 
+		response = str(eval(line)); droid.ttsSpeak(response); exec(responseChannel) in globals(), locals(); 
 		#exec(line) in globals(), locals(); print '\n'; 
 		return
 	except Exception, exception: 
