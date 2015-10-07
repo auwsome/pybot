@@ -7,7 +7,7 @@ ISD starting definition
 '''
 print "init translator"
 ## imports
-import sys, re, json, operator, string
+import os, sys, re, json, operator, string
 #print("%x" % sys.maxsize, sys.maxsize > 2**32) ## 32 or 64 bit
 
 global functionD; functionD = {}; #global pythonVerbsL; 
@@ -94,14 +94,19 @@ def joins(listA): return "".join(listA)
 def joins_(listA): return " ".join(listA)
 def splits(stringA): return stringA.split(" ")
 #def enquote(item): return repr(item)#"'"+item+"'"#return "'%s'" % s1;return "'{}'".format(s1)
-def tryExcept(tryA, exceptA):
+def tryExceptExec(tryA, exceptA):
 	try:
 		exec(tryA)
-	except Exception, e: print 'exeception'; exec(exceptA)
-def tryExceptPrint(tryA):
+	except Exception, e: print 'exeception tryExceptExec'; exec(exceptA)
+def tryExecExceptPrint(tryA):
 	try:
 		exec(tryA)
-	except Exception, e: print 'exeception',e
+	except Exception, e: print 'exeception tryExecExceptPrint',e
+def tryReturnExceptPrint(tryA):
+	try:
+		exec(tryA)
+		#return result
+	except Exception, e: print 'exeception tryReturnExceptPrint',e
 #def ifNotNoneReturnIt(item): return item if item else None  ## only if checking item doesn't throw exception
 def forItem(container,operation): 
 	for item in container: exec(operation)
@@ -136,9 +141,9 @@ def str2bool(v): return v.lower() in ("yes", "true", "t", "1")
 #### initialization functions
 def getFile(file): f = open(file,"rb"); return f.read(); f.close() 
 def writeFile(file): f = open(file,"wb"); return f.read(); f.close()
-def getFileLines(file): tryExceptPrint('f = open(file,"rb"); return f.readlines(); f.close()')
+def getFileLines(file): f = open(file,"rb"); return f.readlines(); f.close()
 def getInstructions(): 
-	if getFileLines("pseudocode.py"): return getFileLines("pseudocode.py")
+	if os.path.isfile("pseudocode.py")  and getFileLines("pseudocode.py"): return getFileLines("pseudocode.py")
 	else: instructionsL = instructionsS.split("\n"); return instructionsL
 dName = "ISD.json"
 def rememberD(dict1): 
@@ -158,7 +163,7 @@ def saveD(dict1): json.dump(ISD, dName)
 
 #global response; 
 response = []; global args; args = None; global responseChannel
-tryExceptPrint('rememberD(ISD)')
+tryExecExceptPrint('rememberD(ISD)')
 ############ main
 def main(line):	
 #### line format first for readlines from file
@@ -324,7 +329,6 @@ def main(line):
 					computeImperative(verbDefL); return 
 			#### loop through multiple verb definitions and execute with original args
 				if len(ISD[verb]['verb']['mydef'])>1:
-					
 					print 'multiple'
 					for index,verbDef in enumerate(ISD[verb]['verb']['mydef']): 
 						print index, verbDef#printvv('definition') #if verbose: print 3,definitionL
@@ -439,11 +443,16 @@ if __name__=="__main__":
 		else: responseChannel = 'print response'
 		#storageFile = realcwd+'/PybotLines.py'
 ## do input from instructions
-	inputList = getInstructions(); #print input
-	for index,line in enumerate(inputList):
-		main(line)
+	try: 
+		inputList = tryReturnExceptPrint('getInstructions()'); #print input
+		if inputList:
+			for index,line in enumerate(inputList): main(line)
+	except Exception, e: print 'exeception instructions',e; 
+	try: 
+		for index,line in enumerate(instructionsS.split("\n")): main(line)
+	except Exception, e: print 'exeception instructions',e; 
 ## do input from user
-	result=None
+	result=1
 	#while line != 'q':
 	#response = 'hi'; exec(responseChannel); response = []; 
 	#main("say hello")
