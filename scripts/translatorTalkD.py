@@ -64,7 +64,7 @@ beep
 # save 
 ## android ##
 to vibrate, if sys_platform_arm: exec droid.vibrate()
-vibrate
+#vibrate
 # to make toast, if sys_platform_arm: exec droid.makeToast()
 #to toast something, if sys_platform_arm: exec droid.makeToast(something)
 #toast 'hi'
