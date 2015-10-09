@@ -11,21 +11,21 @@ import os, sys, re, json, operator, string
 #print("%x" % sys.maxsize, sys.maxsize > 2**32) ## 32 or 64 bit
 
 global functionD; functionD = {}; #global pythonVerbsL; 
-global ISD; ISD = {}; global verbose; verbose = True; global tts; tts = True
+global ISD; ISD = {}; 
 
 #global aaa; aaa = 'engine.say(response); engine.runAndWait()'
 ISD = {
 "execute"	:{"verb": {"mydef": ["exec something"]  }},
 "if"		:{"verb": {"mydef": ["something"]  }},
-#"print"		:{"verb": {"mydef": ["exec print(something)"]  }},
-"print"		:{"verb": {"mydef": ["exec eval(repr(something))"]  }},
+"print"		:{"verb": {"mydef": ["exec print(something)"]  }},
+#"print"		:{"verb": {"mydef": ["exec 'print(eval(repr(something)))'"]  }},
 "write"		:{"verb": {"mydef": ["print something"]  }},
 "scrawl"	:{"verb": {"mydef": ["print something"]  }},
 #"speak"		:{"verb": {"mydef": ["print speaking.. something","exec engine.say(something)","response = []"]  }},
+"speak"		:{"verb": {"mydef": ["print speaking.. something","if sys_platform_win32: exec engine.say(something)"]  }},
 #"speak"	:{"verb": {"mydef": ["print speaking.. something","exec droid.ttsSpeak(response)","response = []"]  }},
 #responseChannel = 'droid.ttsSpeak(response);exec("while droid.ttsIsSpeaking().result: pass")'
 
-#"speak"		:{"verb": {"mydef": ["print speaking.. something","exec responseChannel","response = []"]  }},
 #"speak"		:{"verb": {"mydef": ["print speaking.. something","exec responseChannel","response = []"]  }},
 "say"		:{"verb": {"mydef": ["print something", "speak something"]  }},
 "sayiftts"	:{"verb": {"mydef": ["if not tts: print something", "if tts: say something"]  }},
@@ -43,17 +43,18 @@ ISD = {
 "sys_platform_win32"	:{"noun": {"mydef": "False"} },
 "sys_platform_arm"		:{"noun": {"mydef": "False"} },
 "sys_platform_i686"		:{"noun": {"mydef": "False"} },
-"tts"		:{"noun": {"mydef": "True"} },
-#"tts"		:{"noun": {"mydef": "False"} },
+#"tts"		:{"noun": {"mydef": "True"} },
+"tts"		:{"noun": {"mydef": "False"} },
 "verbose"	:{"noun": {"mydef": "False"} }, #################
-#"verbose"	:{"noun": {"mydef": "True"} }, #################
+"verbose"	:{"noun": {"mydef": "True"} }, #################
 "str1"		:{"noun": {"mydef": "'abc'"} },
 "string1"	:{"noun": {"mydef": "'abc'"} },
 "aString"	:{"noun": {"mydef": "'abc'"} },
 "variable"	:{"noun": {"mydef": "'abc'"} },
 #"response"	:{"noun": {"mydef": "'hi'"} },
 "dict"		:{"noun": {"mydef": "ISD"} }
-}; ISD0 = ISD
+}
+ISD0 = ISD
 
 instructionsS = '''
 #sayiftts 'hi'
@@ -61,10 +62,13 @@ to beep, if sys_platform_win32: exec import winsound; winsound.Beep(2500,300)
 #Freq = 2500 Dur = 100 
 #to beep, if sys_platform_win32: exec import winsound; winsound.Beep(2500,300)
 beep
+say 'hi'
 # save 
+
 ## android ##
-to vibrate, if sys_platform_arm: exec droid.vibrate()
+#to vibrate, if sys_platform_arm: exec droid.vibrate()
 #vibrate
+
 # to make toast, if sys_platform_arm: exec droid.makeToast()
 #to toast something, if sys_platform_arm: exec droid.makeToast(something)
 #toast 'hi'
@@ -97,33 +101,34 @@ def splits(stringA): return stringA.split(" ")
 def tryExceptExec(tryA, exceptA):
 	try:
 		exec(tryA)
-	except Exception, e: print 'exeception tryExceptExec'; exec(exceptA)
+	except Exception, e: exec(exceptA) #print 'exeception tryExceptExec'; 
+	
 def tryExecExceptPrint(tryA):
 	try:
-		exec(tryA)
+		exec('import pyttsx')
+		#exec(tryA)
 	except Exception, e: print 'exeception tryExecExceptPrint',e
+
 def tryReturnExceptPrint(tryA):
 	try:
-		exec(tryA)
-		#return result
+		#a = exec(tryA); print a
+		return tryA
 	except Exception, e: print 'exeception tryReturnExceptPrint',e
+	
 #def ifNotNoneReturnIt(item): return item if item else None  ## only if checking item doesn't throw exception
 def forItem(container,operation): 
 	for item in container: exec(operation)
 def ifThenElse(if1,then1,else1): return then1 if if1 else else1
 def printIf(*args): operation = 'if item: print item'; forItem(args,operation) 
 def ifVerbose(*args): return args if verbose else None 
-def printIfVerbose(stringOfItem): s = ifVerbose(stringOfItem+"=",eval(stringOfItem)); print str(s)+"\n" if s else "",
-def printv(item): 
-	if verbose: print item; response = item; exec(responseChannel)
-#def printV(*args): s = forItem(args,'printIfVerbose(item)') if args[0] else None; exec("eval('s')")
-def printV(*args): return forItem(args,'printv(item)') if args[0] else None
-print "init translator"
-#printV('ISD')
-print "init translator"
+def printIfVerbose(stringOfItem): s = ifVerbose(stringOfItem+"=",eval(stringOfItem)); print str(s)+"\n" if s else "",#
+
 def printl(): print '\n'
 def printq(): print ""
 def addQuotes(stringA): return "'"+stringA+"'"
+
+#print tryReturnExceptPrint("addQuotes('test')")
+
 def ifKeyNotNoneReturnIt(dictA,keyA): 
 	if dictA and keyA in dictA.keys(): return dictA[keyA]  
 	else: return None
@@ -159,10 +164,73 @@ def saveD(dict1): json.dump(ISD, dName)
 #def import1(modulename): modulename = importlib.import_module(modulename)
 
 
+global response; response = []; 
+global args; args = None; global responseChannel
+global verbose; global tts;
+tts = str2bool(ifKeysReturnValueISD("tts",'noun','mydef'))
+verbose = str2bool(ifKeysReturnValueISD("verbose",'noun','mydef'))
 
+######## check and set environment
+print sys.platform
+#### win32+'>')"
+# btw, command line needs to have prefix running script with 'python'
+if sys.platform == 'win32': 
+	ISD['sys_platform_win32'] = {'noun':{'mydef':'True'}}
+	## can't write function for importing without importlib (not in sl4a) because statement vs expression
+	# tryS = 'try:\n\t'+'import pyttsx\n'+'except ImportError,e: print str(e)'; exec(tryS)
+	try:
+		import pyttsx
+	except ImportError,e: print str(e)
+	#engine.say('test'); engine.runAndWait()
+	engine = pyttsx.init()
+	rate = engine.getProperty('rate')
+	engine.setProperty('rate', rate-25)
+	prompt='>'
+	channel = "engine.say(prompt); engine.runAndWait();input = raw_input(prompt)"
+	if tts: responseChannel = 'print response; engine.say(response); engine.runAndWait()'
+	else: responseChannel = 'print response'
+	#storageFile = 'PybotLines.py'
+	#from bs4 import BeautifulSoup
+	#import bs4 as BeautifulSoup'
+#### android
+if 'arm' in sys.platform:# == 'linux-armv71': 
+	ISD['sys_platform_arm'] = {'noun':{'mydef':'True'}}
+	# main('sys_platform_arm = True')
+	# main('sys_platform_win32 = False')
+	import android 
+	#from BeautifulSoup import BeautifulSoup
+	#from bs4 import BeautifulSoup
+	droid = android.Android(); d = droid
+	prompt = ''
+	#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
+	channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
+	channel = "input = raw_input(prompt)"
+	args = droid.getIntent().result[u'extras']; print args
+	try: 
+		if args: input = args['%avcomm']; print input
+	except: pass
+	if tts: responseChannel = 'print response; droid.ttsSpeak(response); exec("while droid.ttsIsSpeaking().result: pass")'
+	else: responseChannel = 'print response'
+	#storageFile = realcwd+'/PybotLines.py'
 
-#global response; 
-response = []; global args; args = None; global responseChannel
+# def printv(item): 
+	# globals().update(locals())
+	# if verbose: print item; response = item; exec(responseChannel)
+##def printV(*args): s = forItem(args,'printIfVerbose(item)') if args[0] else None; exec("eval('s')")
+# def printV(*args): 
+	# globals().update(locals())
+	# return forItem(args,'printv(item)') if args[0] else None
+def printv0(item): 
+	if verbose: response = item; exec(responseChannel) in globals(), locals()
+def printv(item): 
+	globals().update(locals())
+	if verbose: response = repr(item)+":"+str(eval(item)); exec(responseChannel) in globals(), locals()
+def printV(*args): 
+	globals().update(locals())
+	for item in args: printv(item)
+	
+print "init translator"
+#printV('ISD')
 tryExecExceptPrint('rememberD(ISD)')
 ############ main
 def main(line):	
@@ -174,20 +242,17 @@ def main(line):
 	lineList = re.split('(\W)', line); lineList = [i for i in lineList if i != ""]
 	#locals().update(globals()); 
 	#printV('sys.platform','ISD'); printqexecute 
-#### verbosity
+#### verbosity 
 	#global response ## puts global into locals
-	#global verbose; global tts; 
-	#print 'verbose',ifKeysReturnValueISD("verbose",'noun','mydef')
-	verbose = str2bool(ifKeysReturnValueISD("verbose",'noun','mydef'))#verbose = str2bool(ISD['verbose']['noun']['mydef']) 
-	tts = str2bool(ifKeysReturnValueISD("tts",'noun','mydef'))#tts = str2bool(ISD['tts']['noun']['mydef'])
+	global verbose;  
 #### verbose print/respond function under each subfunction
 	#print 1,eval(repr(verbose)), 2,repr(verbose), 3,verbose; 
-	def printv(item): 
-		if verbose: response = repr(item)+":"+str(eval(item)); exec(responseChannel) in globals(), locals()
-	def printV(*args): 
-		for item in args: printv(item)
+	# def printv(item): 
+		# if verbose: response = repr(item)+":"+str(eval(item)); exec(responseChannel) in globals(), locals()
+	# def printV(*args): 
+		# for item in args: printv(item)
 	#printV('verbose','tts','response','args'); 
-	printV('tts'); 
+	global tts; printV('tts'); 
 	global args; global args0; 
 	global count; ## puts local into globals or makes variable global
 	args = ''; args0 = ''
@@ -265,26 +330,19 @@ def main(line):
 	############ compute ***IMPERATIVE*** statements - verb + args
 	elif ifKeysReturnValueISD(kw,'verb','mydef'): 
 		imperativeList = lineList; count=0
-	### parse original args
+### parse original args
 		args0 = string.join(imperativeList[2:],'')
-		# if verbose: print 'args0:',; printv('args')
+		printv('args0'); printv('args')
 	#####################################
 		def computeImperative(imperativeList):
-		#### verbose print/respond function under each subfunction
-			def printv(item): 
-				if verbose: print item; response = item; exec(responseChannel) in globals(), locals()
-			def printvv(stringA): 
-				if verbose: ev = eval(stringA); print stringA, ev
 		#### break infinite loops at certain depth
 			global count; count=count+1; ## puts global into locals
-			if count > 7: exit()
-			global verb; global args;  global args0; #global definition; global verbDef;)
+			if count > 12: exit()
+			global verb; global args; global args0; #global definition; global verbDef;)
 		############ parse imperative statements - verb + args.. sentence structure VO verb-object
-			if verbose: print('imperativeList:',imperativeList) #printv('imperativeList')
+			print('imperativeList1',imperativeList)
 		#### parse verb
-			verb = imperativeList[0]; verbIndex = imperativeList.index(verb); printv('verb')
-		#### parse args
-			args = string.join(imperativeList[2:],''); printv('args')
+			verb = imperativeList[0]; verbIndex = imperativeList.index(verb); printv('verb') 
 		#### replace variables, i.e. evaluate words for known definitions 
 			for index,item in enumerate(imperativeList):
 				if ifKeysReturnValueISD(item,'noun','mydef'): 
@@ -293,12 +351,22 @@ def main(line):
 					if item != 'something': 
 						imperativeList[index] = item; print 'defined..',item0,':with:',item; 
 						if verbose: print imperativeList[index], imperativeList  
-						computeImperative(imperativeList); return
+						print 12
+						computeImperative(imperativeList); print 00; return
+		#### evaluate conditionals
+			if verb == 'if':
+				printv0('if'); condition = joins(imperativeList[2:imperativeList.index(":")]); print 'condition:', repr(condition), '..is..', eval(condition)
+				if eval(condition): definitionL = imperativeList[imperativeList.index(":")+2:]; print 'eval',definitionL; computeImperative(definitionL); return
+				else: print 'not'; return
+		#### parse args
+			args = string.join(imperativeList[2:],''); printv('args')
 		#### try execute if verb = exec
 			if verb == 'exec':
 			#### execute if definition is not recursive
 				execArgs = args; print 'executing..',execArgs
 				try: 
+					#args = 'hi'; print eval(repr(args)); exec('eval(args)') in globals(), locals()
+					# print '\n\n'
 					exec(execArgs) in globals(), locals(); ### not secure(?)
 				except NameError, exception: 
 					execArgs = repr(execArgs); print 'trying..', execArgs
@@ -308,39 +376,39 @@ def main(line):
 				except Exception, exception: print 'myerror: myexec: '+str(exception)
 				return
 		#### try execute definition with verb definitions and args 
-			if verb in ISD.keys(): 
+			#if verb in ISD.keys(): 
 			#### execute if not multiple
-				if len(ISD[verb]['verb']['mydef']) == 1: 
-					printv('single')
-				#### evaluate conditionals
-					if verb == 'if':
-						printv('if'); condition = joins(imperativeList[2:imperativeList.index(":")]); print 'condition:', repr(condition), '..is..', eval(condition)
-						if eval(condition): definitionL = imperativeList[imperativeList.index(":")+3:]; print 'eval',definitionL; computeImperative(definitionL); return
-						else: print 'not'; return
-				#### define..	
-					verbDef = ISD[verb]['verb']['mydef'][0]; print 'verbDef:', verbDef #printvv('verbDef')
+			if len(ISD[verb]['verb']['mydef']) == 1: 
+				printv0('single')
+#### evaluate conditionals
+			#### define..	
+				verbDef = ISD[verb]['verb']['mydef'][0]; print 'verbDef:', verbDef #printvv('verbDef')
+			#### replace 'something' in definitions
+				if 'something' in verbDef: 
+					if verb in ['print','write','speak','say']: 
+						if not args[0] in ["'",'"']: args = repr(args)
+					verbDef = verbDef.replace("something",args); print 'replaced verbDef "something" with', args
+			#### recurse if definition is recursive
+				print 'recurse single'; verbDefL = re.split('(\W)', verbDef); verbDefL = [i for i in verbDefL if i != ""] 
+				computeImperative(verbDefL); return 
+		#### loop through multiple verb definitions and execute with original args
+			if len(ISD[verb]['verb']['mydef'])>1:
+				printv0('multiple')
+			### parse original args
+				print 123, args,args0
+				args0 = args
+				for index,verbDef in enumerate(ISD[verb]['verb']['mydef']): 
+					print index, verbDef#printvv('definition') #if verbose: print 3,definitionL
 				#### replace 'something' in definitions
 					if 'something' in verbDef: 
-						if verb in ['print','write','speak','say']: 
-							if not args[0] in ["'",'"']: args = repr(args)
-						verbDef = verbDef.replace("something",args); print 'replaced verbDef "something" with', args
-				#### recurse if definition is recursive
-					print 'recurse'; verbDefL = re.split('(\W)', verbDef); 
-					computeImperative(verbDefL); return 
-			#### loop through multiple verb definitions and execute with original args
-				if len(ISD[verb]['verb']['mydef'])>1:
-					print 'multiple'
-					for index,verbDef in enumerate(ISD[verb]['verb']['mydef']): 
-						print index, verbDef#printvv('definition') #if verbose: print 3,definitionL
-					#### replace 'something' in definitions
-						if 'something' in verbDef: 
-							verbDef = verbDef.replace("something",args0); print 'replaced verbDef "something" with', args0
-						verbDefL = re.split('(\W)', verbDef); verbDefL = [i for i in verbDefL if i != ""] 
-						try: 
-							computeImperative(verbDefL); 
-						except Exception,e: print 'myerror: multiple '+str(e)
-					
-					return response
+						verbDef = verbDef.replace("something",args0); print 'replaced verbDef "something" with', args0
+					verbDefL = re.split('(\W)', verbDef); verbDefL = [i for i in verbDefL if i != ''] 
+					try: 
+						print 234,verbDef
+						computeImperative(verbDefL); 
+					except Exception,e: print 'myerror: multiple: '+str(e)
+				
+				#return response
 			
 		computeImperative(imperativeList)
 	#####################################
@@ -396,58 +464,12 @@ if __name__=="__main__":
 			input = " ".join(args)
 			print input, sys.argv[0:], len(sys.argv)
 		except Exception,e: print str(e)
-######## check and set environment
-	print sys.platform
-	#### win32+'>')"
-	# btw, command line needs to have prefix running script with 'python'
-	if sys.platform == 'win32': 
-		ISD['sys_platform_win32'] = {'noun':{'mydef':'True'}}
-		# main('sys_platform_win32 = True')
-		# main('sys_platform_arm = False')
-		#tryS = 'try:\n\t'+'import pyttsx\n'+'except ImportError,e: print str(e)'; exec(tryS)
-		try:
-			import pyttsx
-		except ImportError,e: print str(e)
-		#engine.say('test'); engine.runAndWait()
-		engine = pyttsx.init()
-		rate = engine.getProperty('rate')
-		engine.setProperty('rate', rate-25)
-		
-		prompt='>'
-		channel = "engine.say(prompt); engine.runAndWait();input = raw_input(prompt)"
-		#if tts:	
-		
-		if tts: responseChannel = 'print response; engine.say(response); engine.runAndWait()'
-		else: responseChannel = 'print response'
-		#storageFile = 'PybotLines.py'
-		#from bs4 import BeautifulSoup
-		#import bs4 as BeautifulSoup'
-	#### android
-	if 'arm' in sys.platform:# == 'linux-armv71': 
-		ISD['sys_platform_arm'] = {'noun':{'mydef':'True'}}
-		# main('sys_platform_arm = True')
-		# main('sys_platform_win32 = False')
-		import android 
-		#from BeautifulSoup import BeautifulSoup
-		#from bs4 import BeautifulSoup
-		droid = android.Android(); d = droid
-		prompt = ''
-		#channel = 'd.ttsSpeak("yes?"); input = droid.recognizeSpeech(None,None,None).result'
-		channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
-		channel = "input = raw_input(prompt)"
-		args = droid.getIntent().result[u'extras']; print args
-		try: 
-			if args: input = args['%avcomm']; print input
-		except: pass
-		if tts: responseChannel = 'print response; droid.ttsSpeak(response); exec("while droid.ttsIsSpeaking().result: pass")'
-		else: responseChannel = 'print response'
-		#storageFile = realcwd+'/PybotLines.py'
 ## do input from instructions
-	try: 
-		inputList = tryReturnExceptPrint('getInstructions()'); #print input
-		if inputList:
-			for index,line in enumerate(inputList): main(line)
-	except Exception, e: print 'exeception instructions',e; 
+	# try: 
+		# inputList = tryReturnExceptPrint('getInstructions()'); #print input
+		# if inputList:
+			# for index,line in enumerate(inputList): main(line)
+	# except Exception, e: print 'exeception instructions',e; 
 	try: 
 		for index,line in enumerate(instructionsS.split("\n")): main(line)
 	except Exception, e: print 'exeception instructions',e; 
@@ -459,7 +481,6 @@ if __name__=="__main__":
 	while result:
 		#line = raw_input("?"); #print line
 		quit = str2bool(ifKeysReturnValueISD("quit",'noun','mydef'))
-		tts = str2bool(ifKeysReturnValueISD("tts",'noun','mydef'))
 		if not input: exec(channel);
 		else: print 'input:',input
 		if input is None: time.sleep(7); print 'input is None';
