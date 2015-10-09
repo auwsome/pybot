@@ -63,7 +63,7 @@ to beep, if sys_platform_win32: exec import winsound; winsound.Beep(2500,300)
 #Freq = 2500 Dur = 100 
 #to beep, if sys_platform_win32: exec import winsound; winsound.Beep(2500,300)
 beep
-say 'hi'
+#say 'hi'
 # save 
 
 ## android ##
