@@ -49,6 +49,7 @@ ISD = {
 "verbose"	:{"noun": {"mydef": "True"} }, #################
 "str1"		:{"noun": {"mydef": "'abc'"} },
 "string1"	:{"noun": {"mydef": "'abc'"} },
+"string one"	:{"noun": {"mydef": "'abc'"} },
 "aString"	:{"noun": {"mydef": "'abc'"} },
 "variable"	:{"noun": {"mydef": "'abc'"} },
 #"response"	:{"noun": {"mydef": "'hi'"} },
