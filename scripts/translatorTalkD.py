@@ -207,9 +207,6 @@ if 'arm' in sys.platform:# == 'linux-armv71':
 	channel = 'd.ttsSpeak(prompt); input = droid.recognizeSpeech("test",None,None).result'
 	channel = "input = raw_input(prompt)"
 	args = droid.getIntent().result[u'extras']; print args
-	try: 
-		if args: input = args['%avcomm']; print input
-	except: pass
 	if tts: responseChannel = 'print response; droid.ttsSpeak(response); exec("while droid.ttsIsSpeaking().result: pass")'
 	else: responseChannel = 'print response'
 	#storageFile = realcwd+'/PybotLines.py'
@@ -465,6 +462,9 @@ if __name__=="__main__":
 			input = " ".join(args)
 			print input, sys.argv[0:], len(sys.argv)
 		except Exception,e: print str(e)
+	try: 
+		if args: input = args['%avcomm']; print input; main(input)
+	except: pass
 ## do input from instructions
 	# try: 
 		# inputList = tryReturnExceptPrint('getInstructions()'); #print input
