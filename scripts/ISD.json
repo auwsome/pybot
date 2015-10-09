@@ -1,0 +1,150 @@
+{
+    "aString": {
+        "noun": {
+            "mydef": "'abc'"
+        }
+    }, 
+    "beep": {
+        "verb": {
+            "mydef": [
+                "if sys_platform_win32: exec import winsound; winsound.Beep(2500,100) "
+            ]
+        }
+    }, 
+    "dict": {
+        "noun": {
+            "mydef": "ISD"
+        }
+    }, 
+    "execute": {
+        "verb": {
+            "mydef": [
+                "exec something"
+            ]
+        }
+    }, 
+    "if": {
+        "verb": {
+            "mydef": [
+                "something"
+            ]
+        }
+    }, 
+    "print": {
+        "verb": {
+            "mydef": [
+                "exec print(something);println()"
+            ]
+        }
+    }, 
+    "quit": {
+        "noun": {
+            "mydef": "False"
+        }
+    }, 
+    "save": {
+        "verb": {
+            "mydef": [
+                "exec saveD()"
+            ]
+        }
+    }, 
+    "say": {
+        "verb": {
+            "mydef": [
+                "print something", 
+                "speak something"
+            ]
+        }
+    }, 
+    "sayiftts": {
+        "verb": {
+            "mydef": [
+                "if not tts: print something", 
+                "if tts: say something"
+            ]
+        }
+    }, 
+    "scrawl": {
+        "verb": {
+            "mydef": [
+                "print something"
+            ]
+        }
+    }, 
+    "shout": {
+        "verb": {
+            "mydef": [
+                "write something", 
+                "write '!!!'"
+            ], 
+            "otherdef": "yell"
+        }
+    }, 
+    "speak": {
+        "verb": {
+            "mydef": [
+                "print speaking.. something", 
+                "if sys_platform_win32: exec engine.say(something);engine.runAndWait()", 
+                "if sys_platform_arm: exec droid.ttsSpeak(something)"
+            ]
+        }
+    }, 
+    "str1": {
+        "noun": {
+            "mydef": "'abc'"
+        }
+    }, 
+    "string": {
+        "noun": {
+            "mydef": "'test'"
+        }
+    }, 
+    "string one": {
+        "noun": {
+            "mydef": "'abc'"
+        }
+    }, 
+    "string1": {
+        "noun": {
+            "mydef": "'abc'"
+        }
+    }, 
+    "sys_platform_arm": {
+        "noun": {
+            "mydef": "False"
+        }
+    }, 
+    "sys_platform_i686": {
+        "noun": {
+            "mydef": "False"
+        }
+    }, 
+    "sys_platform_win32": {
+        "noun": {
+            "mydef": "True"
+        }
+    }, 
+    "tts": {
+        "noun": {
+            "mydef": "False"
+        }
+    }, 
+    "variable": {
+        "noun": {
+            "mydef": "'abc'"
+        }
+    }, 
+    "verbose": {
+        "noun": {
+            "mydef": "True"
+        }
+    }, 
+    "write": {
+        "verb": {
+            "mydef": [
+                "print something"
+            ]
+        }
+    }
+}
