@@ -22,7 +22,7 @@ ISD = {
 "write"		:{"verb": {"mydef": ["print something"]  }},
 "scrawl"	:{"verb": {"mydef": ["print something"]  }},
 #"speak"		:{"verb": {"mydef": ["print speaking.. something","exec engine.say(something)","response = []"]  }},
-"speak"		:{"verb": {"mydef": ["print speaking.. something","if sys_platform_win32: exec engine.say(something)"]  }},
+"speak"		:{"verb": {"mydef": ["print speaking.. something","if sys_platform_win32: exec engine.say(something)","if sys_platform_arm: exec droid.ttsSpeak(something)"]  }},
 #"speak"	:{"verb": {"mydef": ["print speaking.. something","exec droid.ttsSpeak(response)","response = []"]  }},
 #responseChannel = 'droid.ttsSpeak(response);exec("while droid.ttsIsSpeaking().result: pass")'
 
